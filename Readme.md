@@ -1,7 +1,7 @@
 # Личный проект «Киноман» [![Build status][travis-image]][travis-url]
 
 * Студент: [Yulik K](https://up.htmlacademy.ru/ecmascript/12/user/1150911).
-* Наставник: `Альбина Токарчук (https://htmlacademy.ru/profile/id167491`).
+* Наставник: [Альбина Токарчук](https://htmlacademy.ru/profile/id167491).
 
 ---
 
