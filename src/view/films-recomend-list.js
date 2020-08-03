@@ -1,4 +1,4 @@
-export const createFilmsRecomendLisrTemplate = () => {
+export const createFilmsRecomendListTemplate = () => {
   return (
     `<section class="films-list--extra">
       <h2 class="films-list__title">Most commented</h2>
