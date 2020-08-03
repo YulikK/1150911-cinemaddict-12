@@ -1,7 +1,7 @@
 import {createBoardTemplate} from "./view/board.js";
 import {createFilmCardTemplate} from "./view/film-card.js";
 import {createFilmsListTemplate} from "./view/films-list.js";
-import {createFilmsRecomendListTemplate} from "./view/films-recomend-list.js";
+import {createFilmsRecommendListTemplate} from "./view/films-recommend-list.js";
 import {createFilmsTopListTemplate} from "./view/films-top-list.js";
 import {createNavigationTemplate} from "./view/navigation.js";
 import {createProfileTemplate} from "./view/profile.js";
@@ -33,7 +33,7 @@ const renderTopSection = () => {
 
 const renderRecomendsSection = () => {
 
-  render(siteFilmsElement, createFilmsRecomendListTemplate());
+  render(siteFilmsElement, createFilmsRecommendListTemplate());
 
   const siteFilmsRecomendsContainerElement = siteFilmsElement.querySelector(`.films-list--extra:last-child .films-list__container`);
 
