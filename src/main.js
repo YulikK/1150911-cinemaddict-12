@@ -31,13 +31,13 @@ const renderTopSection = () => {
 
 };
 
-const renderRecomendsSection = () => {
+const renderRecommendsSection = () => {
 
   render(siteFilmsElement, createFilmsRecommendListTemplate());
 
-  const siteFilmsRecomendsContainerElement = siteFilmsElement.querySelector(`.films-list--extra:last-child .films-list__container`);
+  const siteFilmsRecommendsContainerElement = siteFilmsElement.querySelector(`.films-list--extra:last-child .films-list__container`);
 
-  renderCards(siteFilmsRecomendsContainerElement, CARD_EXTRA_COUNT);
+  renderCards(siteFilmsRecommendsContainerElement, CARD_EXTRA_COUNT);
 
 };
 
@@ -60,7 +60,7 @@ render(siteFilmsListElement, createShowMoreButtonTemplate());
 
 renderTopSection();
 
-renderRecomendsSection();
+renderRecommendsSection();
 
 const siteStatisticsElement = siteFooterElement.querySelector(`.footer__statistics`);
 
