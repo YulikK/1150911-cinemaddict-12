@@ -7,9 +7,13 @@ import {createNavigationTemplate} from "./view/navigation.js";
 import {createProfileTemplate} from "./view/profile.js";
 import {createShowMoreButtonTemplate} from "./view/show-more-button.js";
 import {createStatisticsTemplate} from "./view/statistic.js";
+import {generateFilmCard} from "./mock/film-card.js";
 
-const CARD_COUNT = 5;
+const CARD_COUNT = 18;
 const CARD_EXTRA_COUNT = 2;
+const CARD_COUNT_PER_STEP = 5;
+
+const filmCards = new Array(CARD_COUNT).fill().map(generateFilmCard);
 
 const render = (container, template, place = `beforeEnd`) => {
   container.insertAdjacentHTML(place, template);
@@ -54,15 +58,35 @@ const siteFilmsElement = siteMainElement.querySelector(`.films`);
 const siteFilmsListElement = siteFilmsElement.querySelector(`.films-list`);
 const siteFilmsContainerElement = siteFilmsElement.querySelector(`.films-list__container`);
 
-renderCards(siteFilmsContainerElement, CARD_COUNT);
+for (let i = 1; i <= Math.min(filmCards.length, CARD_COUNT_PER_STEP); i++) {
+  render(siteFilmsContainerElement, createFilmCardTemplate(filmCards[i]));
+}
 
-render(siteFilmsListElement, createShowMoreButtonTemplate());
+if (filmCards.length > CARD_COUNT_PER_STEP) {
+  let renderedFilmsCount = CARD_COUNT_PER_STEP;
 
-renderTopSection();
+  render(siteFilmsListElement, createShowMoreButtonTemplate(), `beforeend`);
 
-renderRecommendsSection();
+  const ShowMoreButton = siteFilmsListElement.querySelector(`.films-list__show-more`);
+
+  ShowMoreButton.addEventListener(`click`, (evt) => {
+    evt.preventDefault();
+    filmCards
+      .slice(renderedFilmsCount, renderedFilmsCount + CARD_COUNT_PER_STEP)
+      .forEach((filmCard) => render(siteFilmsContainerElement, createFilmCardTemplate(filmCard)));
+
+    renderedFilmsCount += CARD_COUNT_PER_STEP;
+
+    if (renderedFilmsCount >= filmCards.length) {
+      ShowMoreButton.remove();
+    }
+  });
+}
+
+// renderTopSection();
+
+// renderRecommendsSection();
 
 const siteStatisticsElement = siteFooterElement.querySelector(`.footer__statistics`);
 
 render(siteStatisticsElement, createStatisticsTemplate());
-
