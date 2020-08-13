@@ -1,14 +1,7 @@
 import {humanizeFilmDuration, humanizeFilmShortDate} from "../utils.js";
 
-const getDescriptionView = (description) => {
-  return description.length > 140
-    ? description.substr(0, 139) + `...`
-    : description;
-};
-
 export const createFilmCardTemplate = (filmCard) => {
   const {title, poster, description, comments, rating, date, duration, genres, isWatchlist, isWatched, isFavorite} = filmCard;
-  const descriptionView = getDescriptionView(description);
   const markTemplate = ` film-card__controls-item--active`;
 
   return (
@@ -21,7 +14,7 @@ export const createFilmCardTemplate = (filmCard) => {
           <span class="film-card__genre">${genres[0]}</span>
         </p>
         <img src="${poster}" alt="" class="film-card__poster">
-        <p class="film-card__description">${descriptionView}</p>
+        <p class="film-card__description">${description}</p>
         <a class="film-card__comments">${comments.length} comments</a>
         <form class="film-card__controls">
           <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist${isWatchlist ? markTemplate : ``}">Add to watchlist</button>

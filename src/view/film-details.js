@@ -1,25 +1,25 @@
 import {humanizeFilmDuration, humanizeFilmDate} from "../utils.js";
 
-const createGanreTemplate = (ganres) => {
+const createGenreTemplate = (genres) => {
 
   return (
-    `<span class="film-details__genre">${ganres}</span>`
+    `<span class="film-details__genre">${genres}</span>`
   );
 
 };
 
 const createCommentTemplate = (comment) => {
-  const {text, emoution, autor} = comment;
+  const {text, emotion, autor, date} = comment;
   return (
     `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
-        <img src="./images/emoji/${emoution}.png" width="55" height="55" alt="emoji-smile">
+        <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
       </span>
       <div>
         <p class="film-details__comment-text">${text}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${autor}</span>
-          <span class="film-details__comment-day">2019/12/31 23:59</span>
+          <span class="film-details__comment-day">${humanizeFilmDate(date)}</span>
           <button class="film-details__comment-delete">Delete</button>
         </p>
       </div>
@@ -46,7 +46,7 @@ const createCommentsTemplate = (comments) => {
 export const createFilmDetailsTemplate = (filmCard) => {
   const {title, original, poster, age, description, comments, rating, date, duration, genres, director, writers, actors, country, isWatchlist, isWatched, isFavorite} = filmCard;
   const genresTemplate = genres
-    .map((genre, index) => createGanreTemplate(genre, index === 0))
+    .map((genre, index) => createGenreTemplate(genre, index === 0))
     .join(``);
 
   return (

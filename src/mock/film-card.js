@@ -1,49 +1,47 @@
 import {getRandomInteger, getRandomFloat} from "../utils.js";
 
-const generateFilm = () => {
-  const films = [
-    {
-      title: `Made for each other`,
-      original: `Made for each other`,
-      poster: `./images/posters/made-for-each-other.png`,
-    },
-    {
-      title: `Popeye meets sinbad`,
-      original: `Popeye meets sinbad`,
-      poster: `./images/posters/popeye-meets-sinbad.png`,
-    },
-    {
-      title: `Sagebrush trail`,
-      original: `Sagebrush trail`,
-      poster: `./images/posters/sagebrush-trail.jpg`,
-    },
-    {
-      title: `Santa claus conquers the martians`,
-      original: `Santa claus conquers the martians`,
-      poster: `./images/posters/santa-claus-conquers-the-martians.jpg`,
-    },
-    {
-      title: `The dance of life`,
-      original: `The dance of life`,
-      poster: `./images/posters/the-dance-of-life.jpg`,
-    },
-    {
-      title: `The great flamarion`,
-      original: `The great flamarion`,
-      poster: `./images/posters/the-great-flamarion.jpg`,
-    },
-    {
-      title: `The man with the golden arm`,
-      original: `The man with the golden arm`,
-      poster: `./images/posters/the-man-with-the-golden-arm.jpg`,
-    },
+const generateTitle = () => {
+  const titles = [
+    `Made for each other`,
+    `Popeye meets sinbad`,
+    `Sagebrush trail`,
+    `Santa claus conquers the martians`,
+    `The dance of life`,
+    `The great flamarion`,
+    `The man with the golden arm`,
   ];
 
-  const randomIndex = getRandomInteger(0, films.length - 1);
-
-  return films[randomIndex];
+  return titles[getRandomInteger(0, titles.length - 1)];
 };
 
+const generateOriginalName = () => {
+  const originalNames = [
+    `Made for each other`,
+    `Popeye meets sinbad`,
+    `Sagebrush trail`,
+    `Santa claus conquers the martians`,
+    `The dance of life`,
+    `The great flamarion`,
+    `The man with the golden arm`,
+  ];
+
+  return originalNames[getRandomInteger(0, originalNames.length - 1)];
+};
+
+const generatePoster = () => {
+  const posters = [
+    `./images/posters/made-for-each-other.png`,
+    `./images/posters/popeye-meets-sinbad.png`,
+    `./images/posters/sagebrush-trail.jpg`,
+    `./images/posters/santa-claus-conquers-the-martians.jpg`,
+    `./images/posters/the-dance-of-life.jpg`,
+    `./images/posters/the-great-flamarion.jpg`,
+    `./images/posters/the-man-with-the-golden-arm.jpg`,
+  ];
+
+  return posters[getRandomInteger(0, posters.length - 1)];
+
+};
 const generateDescription = () => {
   const descriptions = [
     `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
@@ -90,7 +88,7 @@ const generateComments = () => {
     `Greate!`,
   ];
 
-  const emoutions = [
+  const emotions = [
     `smile`,
     `sleeping`,
     `puke`,
@@ -112,7 +110,7 @@ const generateComments = () => {
         {
           autor: autors[getRandomInteger(0, autors.length - 1)],
           text: texts[getRandomInteger(0, texts.length - 1)],
-          emoution: emoutions[getRandomInteger(0, emoutions.length - 1)],
+          emotion: emotions[getRandomInteger(0, emotions.length - 1)],
           date: generateDate(),
         }
     );
@@ -146,12 +144,12 @@ const generateGenre = () => {
 
   const randomCount = getRandomInteger(1, 3);
 
-  let ganre = [];
+  let genre = [];
 
   for (let i = 0; i < randomCount; i++) {
-    ganre.push(genres[getRandomInteger(0, genres.length - 1)]);
+    genre.push(genres[getRandomInteger(0, genres.length - 1)]);
   }
-  return ganre;
+  return genre;
 };
 
 const generateDirector = () => {
@@ -213,13 +211,10 @@ const generateActors = () => {
 };
 
 export const generateFilmCard = () => {
-  const film = generateFilm();
-  const {title, poster, original} = film;
-
   return {
-    title,
-    original,
-    poster,
+    title: generateTitle(),
+    original: generateOriginalName(),
+    poster: generatePoster(),
     age: getRandomInteger(0, 18) + `+`,
     description: generateDescription(),
     comments: generateComments(),

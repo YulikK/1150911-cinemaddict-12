@@ -1,15 +1,6 @@
-const getCountAllFilms = (filters) => {
 
-  return filters.find(
-      (filter) => {
-        return filter.name === `all`;
-      }).count;
-
-};
-
-export const createStatisticsTemplate = (filters) => {
-  const countFilms = getCountAllFilms(filters);
+export const createStatisticsTemplate = (allMovies) => {
   return (
-    `<p>${countFilms} movies inside</p>`
+    `<p>${allMovies} movies inside</p>`
   );
 };
