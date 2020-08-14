@@ -1,4 +1,5 @@
 import {getRandomInteger, getRandomFloat} from "../utils.js";
+import {EMOTIONS} from "../const.js";
 
 const generateTitle = () => {
   const titles = [
@@ -30,16 +31,16 @@ const generateOriginalName = () => {
 
 const generatePoster = () => {
   const posters = [
-    `./images/posters/made-for-each-other.png`,
-    `./images/posters/popeye-meets-sinbad.png`,
-    `./images/posters/sagebrush-trail.jpg`,
-    `./images/posters/santa-claus-conquers-the-martians.jpg`,
-    `./images/posters/the-dance-of-life.jpg`,
-    `./images/posters/the-great-flamarion.jpg`,
-    `./images/posters/the-man-with-the-golden-arm.jpg`,
+    `made-for-each-other.png`,
+    `popeye-meets-sinbad.png`,
+    `sagebrush-trail.jpg`,
+    `santa-claus-conquers-the-martians.jpg`,
+    `the-dance-of-life.jpg`,
+    `the-great-flamarion.jpg`,
+    `the-man-with-the-golden-arm.jpg`,
   ];
 
-  return posters[getRandomInteger(0, posters.length - 1)];
+  return `./images/posters/` + posters[getRandomInteger(0, posters.length - 1)];
 
 };
 const generateDescription = () => {
@@ -88,13 +89,6 @@ const generateComments = () => {
     `Greate!`,
   ];
 
-  const emotions = [
-    `smile`,
-    `sleeping`,
-    `puke`,
-    `angry`
-  ];
-
   const autors = [
     `Igor`,
     `Maks`,
@@ -110,7 +104,7 @@ const generateComments = () => {
         {
           autor: autors[getRandomInteger(0, autors.length - 1)],
           text: texts[getRandomInteger(0, texts.length - 1)],
-          emotion: emotions[getRandomInteger(0, emotions.length - 1)],
+          emotion: EMOTIONS[getRandomInteger(0, EMOTIONS.length - 1)],
           date: generateDate(),
         }
     );

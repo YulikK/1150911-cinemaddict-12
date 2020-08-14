@@ -1,4 +1,5 @@
 import {humanizeFilmDuration, humanizeFilmDate} from "../utils.js";
+import {EMOTIONS} from "../const.js";
 
 const createGenreTemplate = (genres) => {
 
@@ -31,7 +32,7 @@ const createCommentTemplate = (comment) => {
 const createCommentsTemplate = (comments) => {
 
   const commentTemplate = comments
-  .map((comment, index) => createCommentTemplate(comment, index === 0))
+  .map((comment) => createCommentTemplate(comment))
   .join(``);
 
   return (
@@ -43,10 +44,33 @@ const createCommentsTemplate = (comments) => {
 
 };
 
+const createEmotionTemplate = (emotion) => {
+  return (
+    `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}">
+    <label class="film-details__emoji-label" for="emoji-${emotion}">
+      <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
+    </label>`
+  );
+
+};
+const createEmojiListTemplate = () => {
+
+  const emotionTemplate = EMOTIONS
+  .map((emotion) => createEmotionTemplate(emotion))
+  .join(``);
+
+  return (
+    `<div class="film-details__emoji-list">
+      ${emotionTemplate}
+    </div>`
+  );
+
+};
+
 export const createFilmDetailsTemplate = (filmCard) => {
   const {title, original, poster, age, description, comments, rating, date, duration, genres, director, writers, actors, country, isWatchlist, isWatched, isFavorite} = filmCard;
   const genresTemplate = genres
-    .map((genre, index) => createGenreTemplate(genre, index === 0))
+    .map((genre) => createGenreTemplate(genre))
     .join(``);
 
   return (
@@ -134,28 +158,7 @@ export const createFilmDetailsTemplate = (filmCard) => {
           <label class="film-details__comment-label">
             <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
           </label>
-
-          <div class="film-details__emoji-list">
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
-            <label class="film-details__emoji-label" for="emoji-smile">
-              <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
-            </label>
-
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
-            <label class="film-details__emoji-label" for="emoji-sleeping">
-              <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
-            </label>
-
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
-            <label class="film-details__emoji-label" for="emoji-puke">
-              <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
-            </label>
-
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
-            <label class="film-details__emoji-label" for="emoji-angry">
-              <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
-            </label>
-          </div>
+          ${createEmojiListTemplate()}
         </div>
       </section>
     </div>

@@ -5,3 +5,10 @@ export const RATING = {
 };
 export const CARD_COUNT_PER_STEP = 5;
 export const CARD_EXTRA_COUNT = 2;
+
+export const EMOTIONS = [
+  `smile`,
+  `sleeping`,
+  `puke`,
+  `angry`
+];
