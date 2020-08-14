@@ -1,7 +1,33 @@
-export const createProfileTemplate = () => {
+import {RATING} from "../const.js";
+
+const getRating = (filters) => {
+
+  const countWatched = filters.find(
+      (filter) => {
+        return filter.name === `history`;
+      }).count;
+
+  let ratingProfile = ``;
+
+  const keys = Object.keys(RATING);
+
+  keys.forEach((key) => {
+
+    if (key <= countWatched) {
+      ratingProfile = RATING[key];
+    }
+
+  });
+
+  return ratingProfile;
+
+};
+
+export const createProfileTemplate = (filters) => {
+  const rating = getRating(filters);
   return (
     `<section class="header__profile profile">
-      <p class="profile__rating">Movie Buff</p>
+      <p class="profile__rating">${rating}</p>
       <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
     </section>`
   );
