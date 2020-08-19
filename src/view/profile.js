@@ -1,4 +1,5 @@
 import {RATING} from "../const.js";
+import {createElement} from "../utils.js";
 
 const getRating = (filters) => {
 
@@ -23,7 +24,7 @@ const getRating = (filters) => {
 
 };
 
-export const createProfileTemplate = (filters) => {
+const createProfileTemplate = (filters) => {
   const rating = getRating(filters);
   return (
     `<section class="header__profile profile">
@@ -32,3 +33,27 @@ export const createProfileTemplate = (filters) => {
     </section>`
   );
 };
+
+export default class Profile {
+  constructor(filters) {
+    this._filters = filters;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createProfileTemplate(this._filters);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
