@@ -110,9 +110,9 @@ const renderFilmBoard = (boardContainer, boardFilms) => {
 };
 
 const siteBodyElement = document.querySelector(`body`);
-const siteHeaderElement = document.querySelector(`.header`);
-const siteMainElement = document.querySelector(`.main`);
-const siteFooterElement = document.querySelector(`.footer`);
+const siteHeaderElement = siteBodyElement.querySelector(`.header`);
+const siteMainElement = siteBodyElement.querySelector(`.main`);
+const siteFooterElement = siteBodyElement.querySelector(`.footer`);
 
 renderElement(siteHeaderElement, new ProfileView(filters).getElement());
 renderElement(siteMainElement, new NavigationView(filters).getElement());
