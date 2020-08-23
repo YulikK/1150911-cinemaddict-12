@@ -2,6 +2,7 @@ import {CARD_COUNT_PER_STEP} from "./const.js";
 import SortView from "./view/sort.js";
 import FilmCardView from "./view/film-card.js";
 import FilmsListView from "./view/films-list.js";
+import NoFilmView from "./view/no-film.js";
 import FilmsListContainerView from "./view/films-list-container.js";
 import NavigationView from "./view/navigation.js";
 import ProfileView from "./view/profile.js";
@@ -23,34 +24,32 @@ const renderFilmCard = (filmCardContainer, filmDetailsContainer, filmCard) => {
   const filmCardComponent = new FilmCardView(filmCard);
   const filmCardDetailsComponent = new FilmCardDetailsView(filmCard);
 
-  const replaceCardToDetails = () => {
+  const showDetails = () => {
     filmDetailsContainer.appendChild(filmCardDetailsComponent.getElement());
-    filmCardContainer.removeChild(filmCardComponent.getElement());
     filmDetailsContainer.classList.add(`hide-overflow`);
   };
 
-  const replaceDetailsToCard = () => {
+  const hideDetails = () => {
     filmDetailsContainer.removeChild(filmCardDetailsComponent.getElement());
-    filmCardContainer.appendChild(filmCardComponent.getElement());
     filmDetailsContainer.classList.remove(`hide-overflow`);
   };
 
   const onEscKeyDown = (evt) => {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       evt.preventDefault();
-      replaceDetailsToCard();
+      hideDetails();
       document.removeEventListener(`keydown`, onEscKeyDown);
     }
   };
 
   const onFilmCardClick = () => {
-    replaceCardToDetails();
+    showDetails();
     document.addEventListener(`keydown`, onEscKeyDown);
   };
 
   const onCloseButtonClick = (evt) => {
     evt.preventDefault();
-    replaceDetailsToCard();
+    hideDetails();
     document.removeEventListener(`keydown`, onEscKeyDown);
   };
 
@@ -63,51 +62,63 @@ const renderFilmCard = (filmCardContainer, filmDetailsContainer, filmCard) => {
   renderElement(filmCardContainer, filmCardComponent.getElement());
 };
 
+const renderFilmBoard = (boardContainer, boardFilms) => {
+
+  const filmsListComponent = new FilmsListView();
+  const filmsListContainerComponent = new FilmsListContainerView();
+
+  renderElement(siteMainElement, filmsListComponent.getElement());
+  renderElement(filmsListComponent.getElement(), filmsListContainerComponent.getElement());
+
+  if (boardFilms.length === 0) {
+    renderElement(filmsListContainerComponent.getElement(), new NoFilmView().getElement());
+    return;
+  }
+
+  const renderStartFilmList = () => {
+    for (let i = 0; i < Math.min(boardFilms.length, CARD_COUNT_PER_STEP); i++) {
+      renderFilmCard(filmsListContainerComponent.getElement(), siteBodyElement, boardFilms[i]);
+    }
+  };
+
+  renderStartFilmList();
+
+  if (boardFilms.length > CARD_COUNT_PER_STEP) {
+
+    const showMoreButtonComponent = new ShowMoreButtonView();
+    renderElement(filmsListComponent.getElement(), showMoreButtonComponent.getElement());
+    let renderedFilmsCount = CARD_COUNT_PER_STEP;
+
+    const onShowMore = (evt) => {
+      evt.preventDefault();
+      boardFilms
+        .slice(renderedFilmsCount, renderedFilmsCount + CARD_COUNT_PER_STEP)
+        .forEach((filmCard) => renderFilmCard(filmsListContainerComponent.getElement(), siteBodyElement, filmCard));
+
+      renderedFilmsCount += CARD_COUNT_PER_STEP;
+
+      if (renderedFilmsCount >= boardFilms.length) {
+        showMoreButtonComponent.getElement().remove();
+        showMoreButtonComponent.removeElement();
+      }
+    };
+
+    showMoreButtonComponent.getElement().addEventListener(`click`, onShowMore);
+
+  }
+
+};
+
 const siteBodyElement = document.querySelector(`body`);
-const siteHeaderElement = document.querySelector(`.header`);
-const siteMainElement = document.querySelector(`.main`);
-const siteFooterElement = document.querySelector(`.footer`);
+const siteHeaderElement = siteBodyElement.querySelector(`.header`);
+const siteMainElement = siteBodyElement.querySelector(`.main`);
+const siteFooterElement = siteBodyElement.querySelector(`.footer`);
 
 renderElement(siteHeaderElement, new ProfileView(filters).getElement());
 renderElement(siteMainElement, new NavigationView(filters).getElement());
 renderElement(siteMainElement, new SortView().getElement());
 
-const filmsListComponent = new FilmsListView();
-const filmsListContainerComponent = new FilmsListContainerView();
-renderElement(siteMainElement, filmsListComponent.getElement());
-renderElement(filmsListComponent.getElement(), filmsListContainerComponent.getElement());
-
-const renderStartFilmList = () => {
-  for (let i = 0; i < Math.min(filmCards.length, CARD_COUNT_PER_STEP); i++) {
-    renderFilmCard(filmsListContainerComponent.getElement(), siteBodyElement, filmCards[i]);
-  }
-};
-
-renderStartFilmList();
-
-if (filmCards.length > CARD_COUNT_PER_STEP) {
-
-  const showMoreButtonComponent = new ShowMoreButtonView();
-  renderElement(filmsListComponent.getElement(), showMoreButtonComponent.getElement());
-  let renderedFilmsCount = CARD_COUNT_PER_STEP;
-
-  const onShowMore = (evt) => {
-    evt.preventDefault();
-    filmCards
-      .slice(renderedFilmsCount, renderedFilmsCount + CARD_COUNT_PER_STEP)
-      .forEach((filmCard) => renderFilmCard(filmsListContainerComponent.getElement(), siteBodyElement, filmCard));
-
-    renderedFilmsCount += CARD_COUNT_PER_STEP;
-
-    if (renderedFilmsCount >= filmCards.length) {
-      showMoreButtonComponent.getElement().remove();
-      showMoreButtonComponent.removeElement();
-    }
-  };
-
-  showMoreButtonComponent.getElement().addEventListener(`click`, onShowMore);
-
-}
+renderFilmBoard(siteMainElement, filmCards);
 
 const siteStatisticsElement = siteFooterElement.querySelector(`.footer__statistics`);
 
