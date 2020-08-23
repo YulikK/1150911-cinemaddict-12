@@ -1,4 +1,5 @@
 import {ucFirst} from "../utils.js";
+import {createElement} from "../utils.js";
 
 const createFilterItemTemplate = (filter, isChecked) => {
   const {name, count} = filter;
@@ -12,7 +13,7 @@ const createFilterItemTemplate = (filter, isChecked) => {
   );
 };
 
-export const createNavigationTemplate = (filterItems) => {
+const createNavigationTemplate = (filterItems) => {
   const filterItemsTemplate = filterItems
     .map((filter, index) => createFilterItemTemplate(filter, index === 0))
     .join(``);
@@ -25,3 +26,26 @@ export const createNavigationTemplate = (filterItems) => {
     </nav>`
   );
 };
+
+export default class Navigation {
+  constructor(filterItems) {
+    this._filterItems = filterItems;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createNavigationTemplate(this._filterItems);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

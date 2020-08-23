@@ -12,3 +12,5 @@ export const EMOTIONS = [
   `puke`,
   `angry`
 ];
+
+export const POSTERS_FOLDER = `./images/posters/`;

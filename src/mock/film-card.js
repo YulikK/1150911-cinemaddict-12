@@ -1,5 +1,5 @@
 import {getRandomInteger, getRandomFloat} from "../utils.js";
-import {EMOTIONS} from "../const.js";
+import {EMOTIONS, POSTERS_FOLDER} from "../const.js";
 
 const generateTitle = () => {
   const titles = [
@@ -40,7 +40,7 @@ const generatePoster = () => {
     `the-man-with-the-golden-arm.jpg`,
   ];
 
-  return `./images/posters/` + posters[getRandomInteger(0, posters.length - 1)];
+  return POSTERS_FOLDER + posters[getRandomInteger(0, posters.length - 1)];
 
 };
 const generateDescription = () => {
