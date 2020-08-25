@@ -1,5 +1,5 @@
-import {ucFirst} from "../utils.js";
-import {createElement} from "../utils.js";
+import {ucFirst} from "../utils/common.js";
+import AbstractView from "./abstract.js";
 
 const createFilterItemTemplate = (filter, isChecked) => {
   const {name, count} = filter;
@@ -27,25 +27,14 @@ const createNavigationTemplate = (filterItems) => {
   );
 };
 
-export default class Navigation {
+export default class Navigation extends AbstractView {
   constructor(filterItems) {
+    super();
     this._filterItems = filterItems;
-    this._element = null;
   }
 
   getTemplate() {
     return createNavigationTemplate(this._filterItems);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
 }
