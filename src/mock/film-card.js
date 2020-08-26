@@ -1,4 +1,4 @@
-import {getRandomInteger, getRandomFloat} from "../utils.js";
+import {getRandomInteger, getRandomFloat} from "../utils/common.js";
 import {EMOTIONS, POSTERS_FOLDER} from "../const.js";
 
 const generateTitle = () => {

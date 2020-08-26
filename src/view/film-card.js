@@ -1,5 +1,5 @@
-import {createElement} from "../utils.js";
-import {humanizeFilmDuration, humanizeFilmShortDate} from "../utils.js";
+import AbstractView from "./abstract.js";
+import {humanizeFilmDuration, humanizeFilmShortDate} from "../utils/film-card.js";
 
 const createFilmCardTemplate = (filmCard) => {
   const {title, poster, description, comments, rating, date, duration, genres, isWatchlist, isWatched, isFavorite} = filmCard;
@@ -26,25 +26,26 @@ const createFilmCardTemplate = (filmCard) => {
   );
 };
 
-export default class FilmCard {
+export default class FilmCard extends AbstractView {
   constructor(filmCard) {
+    super();
     this._filmCard = filmCard;
-    this._element = null;
+    this._filmCardClickHandler = this._filmCardClickHandler.bind(this);
   }
 
   getTemplate() {
     return createFilmCardTemplate(this._filmCard);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _filmCardClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.filmCardClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setFilmCardClickHandler(callback) {
+    this._callback.filmCardClick = callback;
+    this.getElement().querySelector(`.film-card__poster`).addEventListener(`click`, this._filmCardClickHandler);
+    this.getElement().querySelector(`.film-card__title`).addEventListener(`click`, this._filmCardClickHandler);
+    this.getElement().querySelector(`.film-card__comments`).addEventListener(`click`, this._filmCardClickHandler);
   }
 }

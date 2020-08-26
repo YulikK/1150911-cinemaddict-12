@@ -1,6 +1,6 @@
-import {humanizeFilmDuration, humanizeFilmDate} from "../utils.js";
+import {humanizeFilmDuration, humanizeFilmDate} from "../utils/film-card.js";
 import {EMOTIONS} from "../const.js";
-import {createElement} from "../utils.js";
+import AbstractView from "./abstract.js";
 
 const createGenreTemplate = (genres) => {
 
@@ -169,26 +169,25 @@ const createFilmCardDetailsTemplate = (filmCard) => {
   );
 };
 
-export default class FilmCardDetails {
+export default class FilmCardDetails extends AbstractView {
   constructor(filmCard) {
+    super();
     this._filmCard = filmCard;
-    this._element = null;
+    this._closeClickHandler = this._closeClickHandler.bind(this);
   }
 
   getTemplate() {
     return createFilmCardDetailsTemplate(this._filmCard);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _closeClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.editClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setCloseClickHandler(callback) {
+    this._callback.editClick = callback;
+    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, this._closeClickHandler);
   }
 }
 
