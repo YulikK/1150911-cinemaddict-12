@@ -7,6 +7,8 @@ import FilmsListContainerView from "../view/films-list-container.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
 import FilmCardDetailsView from "../view/film-details.js";
 import {render, hideDetails, showDetails, remove} from "../utils/render.js";
+import {SortType} from "../const.js";
+import {sortByDate, sortByRating} from "../utils/film-card.js";
 
 export default class MovieList {
   constructor(movieContainer, movieDetailsContainer) {
@@ -20,6 +22,7 @@ export default class MovieList {
     this._renderedFilmCount = CARD_COUNT_PER_STEP;
 
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(films) {
@@ -34,8 +37,34 @@ export default class MovieList {
     this._renderBoard();
   }
 
+  _sortFilms(sortType) {
+    switch (sortType) {
+      case SortType.BY_DATE:
+        this._boardFilms.sort(sortByDate);
+        break;
+      case SortType.BY_RATING:
+        this._boardFilms.sort(sortByRating);
+        break;
+      default:
+        this._boardFilms = this._sourcedBoardFilms.slice();
+    }
+
+    this._currentSortType = sortType;
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._sortFilms(sortType);
+    this._clearFilmList();
+    this._renderFilmList();
+  }
+
   _renderSort() {
     render(this._movieContainer, this._sortComponent);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderFilmCard(filmCard) {
@@ -63,7 +92,6 @@ export default class MovieList {
     filmCardComponent.setFilmCardClickHandler(onFilmCardClick);
 
     filmCardDetailsComponent.setCloseClickHandler(onCloseButtonClick);
-
     render(this._filmsListContainerComponent, filmCardComponent);
   }
 
@@ -89,6 +117,11 @@ export default class MovieList {
   _renderShowMoreButton() {
     render(this._filmsListComponent, this._showMoreButtonComponent);
     this._showMoreButtonComponent.setClickHandler(this._handleShowMoreButtonClick);
+  }
+
+  _clearFilmList() {
+    this._filmsListContainerComponent.getElement().innerHTML = ``;
+    this._renderedFilmCount = CARD_COUNT_PER_STEP;
   }
 
   _renderFilmList() {
