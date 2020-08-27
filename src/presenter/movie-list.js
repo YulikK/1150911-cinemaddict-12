@@ -6,7 +6,7 @@ import NoFilmView from "../view/no-film.js";
 import FilmsListContainerView from "../view/films-list-container.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
 import FilmCardDetailsView from "../view/film-details.js";
-import {render, hideDetails, showDetails, remove, changeActiveSort} from "../utils/render.js";
+import {render, hideDetails, showDetails, remove} from "../utils/render.js";
 import {SortType} from "../const.js";
 import {sortByDate, sortByRating} from "../utils/film-card.js";
 
@@ -53,12 +53,20 @@ export default class MovieList {
     this._currentSortType = sortType;
   }
 
+  _setActiveSortElement(sortType) {
+    const sortComponent = this._sortComponent.getElement();
+    const oldSortElement = sortComponent.querySelector(`a[data-sort-type="${this._currentSortType}"]`);
+    const newSortElement = sortComponent.querySelector(`a[data-sort-type="${sortType}"]`);
+    oldSortElement.classList.remove(`sort__button--active`);
+    newSortElement.classList.add(`sort__button--active`);
+  }
+
   _handleSortTypeChange(sortType) {
     if (this._currentSortType === sortType) {
       return;
     }
 
-    changeActiveSort(this._sortComponent, this._currentSortType, sortType);
+    this._setActiveSortElement(sortType);
     this._sortFilms(sortType);
     this._clearFilmList();
     this._renderFilmList();
