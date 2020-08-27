@@ -9,3 +9,40 @@ export const humanizeFilmDate = (date) => {
 export const humanizeFilmShortDate = (date) => {
   return date.toLocaleString(`en-US`, {year: `numeric`});
 };
+
+const getWeightForNullDate = (dateA, dateB) => {
+  if (dateA === null && dateB === null) {
+    return 0;
+  }
+
+  if (dateA === null) {
+    return 1;
+  }
+
+  if (dateB === null) {
+    return -1;
+  }
+
+  return null;
+};
+
+export const sortByDate = (filmA, filmB) => {
+
+  const weight = getWeightForNullDate(filmA.date, filmB.date);
+
+  if (weight !== null) {
+    return weight;
+  }
+
+  return filmA.date.getTime() - filmB.date.getTime();
+};
+
+export const sortByRating = (filmA, filmB) => {
+  const weight = getWeightForNullDate(filmA.rating, filmB.rating);
+
+  if (weight !== null) {
+    return weight;
+  }
+
+  return filmB.rating - filmA.rating;
+};
