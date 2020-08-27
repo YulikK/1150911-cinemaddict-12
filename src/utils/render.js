@@ -69,3 +69,13 @@ export const remove = (component) => {
   component.getElement().remove();
   component.removeElement();
 };
+
+export const changeActiveSort = (sortComponent, oldSort, newSort) => {
+  if (sortComponent instanceof Abstract) {
+    sortComponent = sortComponent.getElement();
+  }
+  const oldSortElement = sortComponent.querySelector(`a[data-sort-type="${oldSort}"]`);
+  const newSortElement = sortComponent.querySelector(`a[data-sort-type="${newSort}"]`);
+  oldSortElement.classList.remove(`sort__button--active`);
+  newSortElement.classList.add(`sort__button--active`);
+};

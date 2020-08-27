@@ -6,7 +6,7 @@ import NoFilmView from "../view/no-film.js";
 import FilmsListContainerView from "../view/films-list-container.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
 import FilmCardDetailsView from "../view/film-details.js";
-import {render, hideDetails, showDetails, remove} from "../utils/render.js";
+import {render, hideDetails, showDetails, remove, changeActiveSort} from "../utils/render.js";
 import {SortType} from "../const.js";
 import {sortByDate, sortByRating} from "../utils/film-card.js";
 
@@ -20,6 +20,7 @@ export default class MovieList {
     this._noFilmComponent = new NoFilmView();
     this._sortComponent = new SortView();
     this._renderedFilmCount = CARD_COUNT_PER_STEP;
+    this._currentSortType = SortType.DEFAULT;
 
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
@@ -57,6 +58,7 @@ export default class MovieList {
       return;
     }
 
+    changeActiveSort(this._sortComponent, this._currentSortType, sortType);
     this._sortFilms(sortType);
     this._clearFilmList();
     this._renderFilmList();
