@@ -6,6 +6,7 @@ import NoFilmView from "../view/no-film.js";
 import FilmsListContainerView from "../view/films-list-container.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
 import {render, remove} from "../utils/render.js";
+import {updateItem} from "../utils/common.js";
 import {SortType} from "../const.js";
 import {sortByDate, sortByRating} from "../utils/film-card.js";
 
@@ -23,6 +24,7 @@ export default class MovieList {
 
     this._filmPresenter = {};
 
+    this._handleFilmCardChange = this._handleFilmCardChange.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
@@ -37,6 +39,12 @@ export default class MovieList {
     render(this._filmsListComponent, this._filmsListContainerComponent);
 
     this._renderBoard();
+  }
+
+  _handleFilmCardChange(updatedFilm) {
+    this._boardFilms = updateItem(this._boardFilms, updatedFilm);
+    this._sourcedBoardFilms = updateItem(this._sourcedBoardFilms, updatedFilm);
+    this._filmPresenter[updatedFilm.id].init(updatedFilm);
   }
 
   _sortFilms(sortType) {
