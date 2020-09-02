@@ -1,12 +1,11 @@
 import {CARD_COUNT_PER_STEP} from "../const.js";
+import FilmPresenter from "../presenter/film-card.js";
 import SortView from "../view/sort.js";
-import FilmCardView from "../view/film-card.js";
 import FilmsListView from "../view/films-list.js";
 import NoFilmView from "../view/no-film.js";
 import FilmsListContainerView from "../view/films-list-container.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
-import FilmCardDetailsView from "../view/film-details.js";
-import {render, hideDetails, showDetails, remove} from "../utils/render.js";
+import {render, remove} from "../utils/render.js";
 import {SortType} from "../const.js";
 import {sortByDate, sortByRating} from "../utils/film-card.js";
 
@@ -78,31 +77,8 @@ export default class MovieList {
   }
 
   _renderFilmCard(filmCard) {
-    const filmCardComponent = new FilmCardView(filmCard);
-    const filmCardDetailsComponent = new FilmCardDetailsView(filmCard);
-
-    const onEscKeyDown = (evt) => {
-      if (evt.key === `Escape` || evt.key === `Esc`) {
-        evt.preventDefault();
-        hideDetails(this._movieDetailsContainer, filmCardDetailsComponent);
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      }
-    };
-
-    const onFilmCardClick = () => {
-      showDetails(this._movieDetailsContainer, filmCardDetailsComponent);
-      document.addEventListener(`keydown`, onEscKeyDown);
-    };
-
-    const onCloseButtonClick = () => {
-      hideDetails(this._movieDetailsContainer, filmCardDetailsComponent);
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    };
-
-    filmCardComponent.setFilmCardClickHandler(onFilmCardClick);
-
-    filmCardDetailsComponent.setCloseClickHandler(onCloseButtonClick);
-    render(this._filmsListContainerComponent, filmCardComponent);
+    const filmPresenter = new FilmPresenter(this._filmsListContainerComponent, this._movieDetailsContainer);
+    filmPresenter.init(filmCard);
   }
 
   _renderFilmCards(from, to) {
