@@ -3,15 +3,19 @@ import FilmCardDetailsView from "../view/film-details.js";
 import {render, hideDetails, showDetails, replace, remove} from "../utils/render.js";
 
 export default class FilmCard {
-  constructor(filmCardContainer, filmCardDetailsContainer) {
+  constructor(filmCardContainer, filmCardDetailsContainer, changeData) {
     this._filmCardContainer = filmCardContainer;
     this._filmCardDetailsContainer = filmCardDetailsContainer;
+    this._changeData = changeData;
 
     this._filmCardComponent = null;
     this._filmCardDetailsComponent = null;
 
     this._handleFilmCardClick = this._handleFilmCardClick.bind(this);
     this._handleCloseButtonClick = this._handleCloseButtonClick.bind(this);
+    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._handleWatchedClick = this._handleWatchedClick.bind(this);
+    this._handleAddWatchListClick = this._handleAddWatchListClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
   init(film) {
@@ -25,6 +29,10 @@ export default class FilmCard {
 
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick);
     this._filmCardDetailsComponent.setCloseClickHandler(this._handleCloseButtonClick);
+
+    this._filmCardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._filmCardComponent.setWatchedClickHandler(this._handleWatchedClick);
+    this._filmCardComponent.setAddWatchListClickHandler(this._handleAddWatchListClick);
 
     if (prevfilmCardComponent === null || prevfilmCardDetailsComponent === null) {
       render(this._filmCardContainer, this._filmCardComponent);
@@ -58,11 +66,48 @@ export default class FilmCard {
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 
+  _handleFavoriteClick() {
+    this._changeData(
+        Object.assign(
+            {},
+            this._film,
+            {
+              isFavorite: !this._film.isFavorite
+            }
+        )
+    );
+  }
+
+  _handleWatchedClick() {
+    this._changeData(
+        Object.assign(
+            {},
+            this._film,
+            {
+              isWatched: !this._film.isWatched
+            }
+        )
+    );
+  }
+
+  _handleAddWatchListClick() {
+    this._changeData(
+        Object.assign(
+            {},
+            this._film,
+            {
+              isWatchlist: !this._film.isWatchlist
+            }
+        )
+    );
+  }
+
   _handleFilmCardClick() {
     this._showFilmDetails();
   }
 
-  _handleCloseButtonClick() {
+  _handleCloseButtonClick(film) {
+    this._changeData(film);
     this._hideFilmDetails();
   }
 
