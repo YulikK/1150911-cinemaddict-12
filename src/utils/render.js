@@ -25,7 +25,7 @@ export const render = (container, child, place = RenderPosition.BEFOREEND) => {
   }
 };
 
-export const renderTemplate = (container, template, place) => {
+export const renderTemplate = (container, template, place = RenderPosition.BEFOREEND) => {
   if (container instanceof Abstract) {
     container = container.getElement();
   }

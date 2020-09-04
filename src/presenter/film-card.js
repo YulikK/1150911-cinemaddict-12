@@ -1,6 +1,6 @@
 import FilmCardView from "../view/film-card.js";
 import FilmCardDetailsView from "../view/film-details.js";
-import {render, hideDetails, showDetails, replace, remove} from "../utils/render.js";
+import {render, hideDetails, showDetails, remove} from "../utils/render.js";
 
 export default class FilmCard {
   constructor(filmCardContainer, filmCardDetailsContainer, changeData) {
@@ -21,34 +21,36 @@ export default class FilmCard {
   init(film) {
     this._film = film;
 
-    const prevfilmCardComponent = this._filmCardComponent;
-    const prevfilmCardDetailsComponent = this._filmCardDetailsComponent;
-
     this._filmCardComponent = new FilmCardView(film);
     this._filmCardDetailsComponent = new FilmCardDetailsView(film);
 
+    this._setListnersComponent();
+
+    render(this._filmCardContainer, this._filmCardComponent);
+
+  }
+
+  update(film) {
+    this._film = film;
+
+    this._filmCardComponent.update(this._film);
+    this._filmCardDetailsComponent.update(this._film);
+
+  }
+
+  _setListnersComponent() {
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick);
     this._filmCardDetailsComponent.setCloseClickHandler(this._handleCloseButtonClick);
 
-    this._filmCardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._filmCardComponent.setWatchedClickHandler(this._handleWatchedClick);
-    this._filmCardComponent.setAddWatchListClickHandler(this._handleAddWatchListClick);
+    this._setCommonListners(this._filmCardComponent);
+    this._setCommonListners(this._filmCardDetailsComponent);
 
-    if (prevfilmCardComponent === null || prevfilmCardDetailsComponent === null) {
-      render(this._filmCardContainer, this._filmCardComponent);
-      return;
-    }
+  }
 
-    if (this._filmCardContainer.getElement().contains(prevfilmCardComponent.getElement())) {
-      replace(this._filmCardComponent, prevfilmCardComponent);
-    }
-
-    if (this._filmCardContainer.getElement().contains(prevfilmCardDetailsComponent.getElement())) {
-      replace(this._filmCardDetailsComponent, prevfilmCardDetailsComponent);
-    }
-
-    remove(prevfilmCardComponent);
-    remove(prevfilmCardDetailsComponent);
+  _setCommonListners(component) {
+    component.setFavoriteClickHandler(this._handleFavoriteClick);
+    component.setWatchedClickHandler(this._handleWatchedClick);
+    component.setAddWatchListClickHandler(this._handleAddWatchListClick);
   }
 
   destroy() {

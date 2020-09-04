@@ -1,10 +1,33 @@
 import AbstractView from "./abstract.js";
 import {humanizeFilmDuration, humanizeFilmShortDate} from "../utils/film-card.js";
+import {replace, createElement} from "../utils/render.js";
+
+const markTemplate = ` film-card__controls-item--active`;
+
+const createWatchedTemplate = (isWatched) => {
+  return (
+    `<button class="film-card__controls-item button film-card__controls-item--mark-as-watched${isWatched ? markTemplate : ``}">Mark as watched</button>`
+  );
+};
+
+const createWatchlistTemplate = (isWatchlist) => {
+  return (
+    `<button class="film-card__controls-item button film-card__controls-item--add-to-watchlist${isWatchlist ? markTemplate : ``}">Add to watchlist</button>`
+  );
+};
+
+const createFavoriteTemplate = (isFavorite) => {
+  return (
+    `<button class="film-card__controls-item button film-card__controls-item--favorite${isFavorite ? markTemplate : ``}">Mark as favorite</button>`
+  );
+};
 
 const createFilmCardTemplate = (filmCard) => {
   const {title, poster, description, comments, rating, date, duration, genres, isWatchlist, isWatched, isFavorite} = filmCard;
-  const markTemplate = ` film-card__controls-item--active`;
 
+  const watchedTemplate = createWatchedTemplate(isWatched);
+  const watchlistTemplate = createWatchlistTemplate(isWatchlist);
+  const favoriteTemplate = createFavoriteTemplate(isFavorite);
   return (
     `<article class="film-card">
         <h3 class="film-card__title">${title}</h3>
@@ -18,9 +41,9 @@ const createFilmCardTemplate = (filmCard) => {
         <p class="film-card__description">${description}</p>
         <a class="film-card__comments">${comments.length} comments</a>
         <form class="film-card__controls">
-          <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist${isWatchlist ? markTemplate : ``}">Add to watchlist</button>
-          <button class="film-card__controls-item button film-card__controls-item--mark-as-watched${isWatched ? markTemplate : ``}">Mark as watched</button>
-          <button class="film-card__controls-item button film-card__controls-item--favorite${isFavorite ? markTemplate : ``}">Mark as favorite</button>
+          ${watchlistTemplate}
+          ${watchedTemplate}
+          ${favoriteTemplate}
         </form>
       </article>`
   );
@@ -38,6 +61,76 @@ export default class FilmCard extends AbstractView {
 
   getTemplate() {
     return createFilmCardTemplate(this._filmCard);
+  }
+
+  update(filmCard) {
+
+    const prevFilmCard = this._filmCard;
+
+    this._filmCard = filmCard;
+
+    if (!prevFilmCard.isFavorite === this._filmCard.isFavorite) {
+
+      this._updateFavorite();
+
+    } else if (!prevFilmCard.isWatched === this._filmCard.isWatched) {
+
+      this._updateWatched();
+
+    } else if (!prevFilmCard.isWatchlist === this._filmCard.isWatchlist) {
+
+      this._updateWatchList();
+
+    }
+
+  }
+
+  _updateFavorite() {
+
+    const element = this.getElement();
+    const selectorClass = `.film-card__controls-item--favorite`;
+
+    const favoriteTemplate = createFavoriteTemplate(this._filmCard.isFavorite);
+    const favoriteElement = createElement(favoriteTemplate);
+
+    replace(favoriteElement, element.querySelector(selectorClass));
+
+    element
+        .querySelector(selectorClass)
+        .addEventListener(`click`, this._callback.favoriteClick);
+
+  }
+
+  _updateWatched() {
+
+    const element = this.getElement();
+    const selectorClass = `.film-card__controls-item--mark-as-watched`;
+
+    const watchedTemplate = createWatchedTemplate(this._filmCard.isWatched);
+    const watchedElement = createElement(watchedTemplate);
+
+    replace(watchedElement, element.querySelector(selectorClass));
+
+    element
+        .querySelector(selectorClass)
+        .addEventListener(`click`, this._callback.watchedClick);
+
+  }
+
+  _updateWatchList() {
+
+    const element = this.getElement();
+    const selectorClass = `.film-card__controls-item--add-to-watchlist`;
+
+    const watchListTemplate = createWatchlistTemplate(this._filmCard.isWatchlist);
+    const watchListElement = createElement(watchListTemplate);
+
+    replace(watchListElement, element.querySelector(selectorClass));
+
+    element
+        .querySelector(selectorClass)
+        .addEventListener(`click`, this._callback.addWatchListClick);
+
   }
 
   _filmCardClickHandler(evt) {
