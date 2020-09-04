@@ -1,7 +1,6 @@
 import {humanizeFilmDuration, humanizeFilmDate} from "../utils/film-card.js";
 import {EMOTIONS} from "../const.js";
-import {replace, createElement} from "../utils/render.js";
-import AbstractView from "./abstract.js";
+import SmartView from "./smart.js";
 
 const createGenreTemplate = (genres) => {
 
@@ -193,7 +192,7 @@ const createFilmCardDetailsTemplate = (filmCard) => {
   );
 };
 
-export default class FilmCardDetails extends AbstractView {
+export default class FilmCardDetails extends SmartView {
   constructor(filmCard) {
     super();
     this._filmCard = filmCard;
@@ -207,74 +206,16 @@ export default class FilmCardDetails extends AbstractView {
     return createFilmCardDetailsTemplate(this._filmCard);
   }
 
-  update(filmCard) {
-
-    const prevFilmCard = this._filmCard;
-
-    this._filmCard = filmCard;
-
-    if (!prevFilmCard.isFavorite === this._filmCard.isFavorite) {
-
-      this._updateFavorite();
-
-    } else if (!prevFilmCard.isWatched === this._filmCard.isWatched) {
-
-      this._updateWatched();
-
-    } else if (!prevFilmCard.isWatchlist === this._filmCard.isWatchlist) {
-
-      this._updateWatchList();
-
-    }
-
+  getFavoriteTemplate() {
+    return createFavoriteTemplate(this._filmCard.isFavorite);
   }
 
-  _updateFavorite() {
-
-    const element = this.getElement();
-    const selectorClass = `input[id=favorite]`;
-
-    const favoriteTemplate = createFavoriteTemplate(this._filmCard.isFavorite);
-    const favoriteElement = createElement(favoriteTemplate);
-
-    replace(favoriteElement, element.querySelector(selectorClass));
-
-    element
-        .querySelector(selectorClass)
-        .addEventListener(`click`, this._callback.favoriteClick);
-
+  getWatchedTemplate() {
+    return createWatchedTemplate(this._filmCard.isWatched);
   }
 
-  _updateWatched() {
-
-    const element = this.getElement();
-    const selectorClass = `input[id=watched]`;
-
-    const watchedTemplate = createWatchedTemplate(this._filmCard.isWatched);
-    const watchedElement = createElement(watchedTemplate);
-
-    replace(watchedElement, element.querySelector(selectorClass));
-
-    element
-        .querySelector(selectorClass)
-        .addEventListener(`click`, this._callback.watchedClick);
-
-  }
-
-  _updateWatchList() {
-
-    const element = this.getElement();
-    const selectorClass = `input[id=watchlist]`;
-
-    const watchListTemplate = createWatchlistTemplate(this._filmCard.isWatchlist);
-    const watchListElement = createElement(watchListTemplate);
-
-    replace(watchListElement, element.querySelector(selectorClass));
-
-    element
-        .querySelector(selectorClass)
-        .addEventListener(`click`, this._callback.addWatchListClick);
-
+  getWatchlistTemplate() {
+    return createWatchlistTemplate(this._filmCard.isWatchlist);
   }
 
   _closeClickHandler(evt) {

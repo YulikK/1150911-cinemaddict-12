@@ -44,7 +44,6 @@ export default class MovieList {
   _handleFilmCardChange(updatedFilm) {
     this._boardFilms = updateItem(this._boardFilms, updatedFilm);
     this._sourcedBoardFilms = updateItem(this._sourcedBoardFilms, updatedFilm);
-    // this._filmPresenter[updatedFilm.id].init(updatedFilm);
     this._filmPresenter[updatedFilm.id].update(updatedFilm);
   }
 

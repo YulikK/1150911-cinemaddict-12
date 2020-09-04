@@ -32,9 +32,8 @@ export default class FilmCard {
 
   update(film) {
     this._film = film;
-
     this._filmCardComponent.update(this._film);
-    this._filmCardDetailsComponent.update(this._film);
+    this._filmCardDetailsComponent.update(this._film, true);
 
   }
 
@@ -108,8 +107,7 @@ export default class FilmCard {
     this._showFilmDetails();
   }
 
-  _handleCloseButtonClick(film) {
-    this._changeData(film);
+  _handleCloseButtonClick() {
     this._hideFilmDetails();
   }
 
