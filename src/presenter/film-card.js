@@ -1,21 +1,25 @@
 import FilmCardView from "../view/film-card.js";
 import FilmCardDetailsView from "../view/film-details.js";
 import {render, hideDetails, showDetails, remove} from "../utils/render.js";
+import {Mode} from "../const.js";
 
 export default class FilmCard {
-  constructor(filmCardContainer, filmCardDetailsContainer, changeData) {
+  constructor(filmCardContainer, filmCardDetailsContainer, changeData, changeMode) {
     this._filmCardContainer = filmCardContainer;
     this._filmCardDetailsContainer = filmCardDetailsContainer;
     this._changeData = changeData;
+    this._changeMode = changeMode;
 
     this._filmCardComponent = null;
     this._filmCardDetailsComponent = null;
+    this._mode = Mode.DEFAULT;
 
     this._handleFilmCardClick = this._handleFilmCardClick.bind(this);
     this._handleCloseButtonClick = this._handleCloseButtonClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleWatchedClick = this._handleWatchedClick.bind(this);
     this._handleAddWatchListClick = this._handleAddWatchListClick.bind(this);
+    this._handleEmojiChange = this._handleEmojiChange.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
   init(film) {
@@ -37,9 +41,16 @@ export default class FilmCard {
 
   }
 
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._hideFilmDetails();
+    }
+  }
+
   _setListnersComponent() {
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick);
     this._filmCardDetailsComponent.setCloseClickHandler(this._handleCloseButtonClick);
+    this._filmCardDetailsComponent.setEmojiClickHandler(this._handleEmojiChange);
 
     this._setCommonListners(this._filmCardComponent);
     this._setCommonListners(this._filmCardDetailsComponent);
@@ -60,11 +71,14 @@ export default class FilmCard {
   _showFilmDetails() {
     showDetails(this._filmCardDetailsContainer, this._filmCardDetailsComponent);
     document.addEventListener(`keydown`, this._escKeyDownHandler);
+    this._changeMode();
+    this._mode = Mode.DETAILS;
   }
 
   _hideFilmDetails() {
     hideDetails(this._filmCardDetailsContainer, this._filmCardDetailsComponent);
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
+    this._mode = Mode.DEFAULT;
   }
 
   _handleFavoriteClick() {
@@ -109,6 +123,10 @@ export default class FilmCard {
 
   _handleCloseButtonClick() {
     this._hideFilmDetails();
+  }
+
+  _handleEmojiChange(newEmogi) {
+    this._filmCardDetailsComponent.changeEmoji(newEmogi);
   }
 
   _escKeyDownHandler(evt) {

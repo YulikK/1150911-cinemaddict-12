@@ -45,9 +45,9 @@ const createCommentsTemplate = (comments) => {
 
 };
 
-const createEmotionTemplate = (emotion) => {
+const createEmotionTemplate = (emotion, checked = false) => {
   return (
-    `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}">
+    `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}" ${checked ? `checked` : ``}>
     <label class="film-details__emoji-label" for="emoji-${emotion}">
       <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
     </label>`
@@ -64,6 +64,15 @@ const createEmojiListTemplate = () => {
   return (
     `<div class="film-details__emoji-list">
       ${emotionTemplate}
+    </div>`
+  );
+
+};
+
+const createAddEmojiTemplate = (emotion) => {
+  return (
+    `<div for="add-emoji" class="film-details__add-emoji-label">
+      <img src="images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
     </div>`
   );
 
@@ -200,6 +209,7 @@ export default class FilmCardDetails extends SmartView {
     this._watchedClickHandler = this._watchedClickHandler.bind(this);
     this._addWatchListClickHandler = this._addWatchListClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+    this._emojiClickHandler = this._emojiClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -216,6 +226,25 @@ export default class FilmCardDetails extends SmartView {
 
   getWatchlistTemplate() {
     return createWatchlistTemplate(this._filmCard.isWatchlist);
+  }
+
+  _setNewEmoji(newEmogi) {
+    const selectorUpdateElement = `.film-details__add-emoji-label`;
+    const elementTemplate = createAddEmojiTemplate(newEmogi);
+    const restoreCallback = this._callback.emojiClick;
+    this.updateElement(selectorUpdateElement, restoreCallback, elementTemplate);
+  }
+
+  _setActiveEmojiItem(newEmogi) {
+    const selectorUpdateElement = `input[id=emoji-${newEmogi}]`;
+    const elementTemplate = createEmotionTemplate(newEmogi, true);
+    const restoreCallback = this._callback.emojiClick;
+    this.updateElement(selectorUpdateElement, restoreCallback, elementTemplate);
+  }
+
+  changeEmoji(newEmogi) {
+    this._setNewEmoji(newEmogi);
+    this._setActiveEmojiItem(newEmogi);
   }
 
   _closeClickHandler(evt) {
@@ -238,6 +267,11 @@ export default class FilmCardDetails extends SmartView {
     this._callback.addWatchListClick();
   }
 
+  _emojiClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.emojiClick(evt.target.value);
+  }
+
   setCloseClickHandler(callback) {
     this._callback.closeClick = callback;
     this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, this._closeClickHandler);
@@ -256,6 +290,13 @@ export default class FilmCardDetails extends SmartView {
   setAddWatchListClickHandler(callback) {
     this._callback.addWatchListClick = callback;
     this.getElement().querySelector(`input[id=watchlist]`).addEventListener(`click`, this._addWatchListClickHandler);
+  }
+
+  setEmojiClickHandler(callback) {
+    this._callback.emojiClick = callback;
+    const emojiItems = this.getElement().querySelectorAll(`input[name=comment-emoji]`);
+    emojiItems
+      .forEach((emojiItem) => emojiItem.addEventListener(`click`, this._emojiClickHandler));
   }
 }
 
