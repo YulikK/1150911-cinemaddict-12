@@ -9,9 +9,9 @@ const createWatchedTemplate = (isWatched) => {
   );
 };
 
-const createWatchlistTemplate = (isWatchlist) => {
+const createWatchListTemplate = (isWatchList) => {
   return (
-    `<button class="film-card__controls-item button film-card__controls-item--add-to-watchlist${isWatchlist ? markTemplate : ``}">Add to watchlist</button>`
+    `<button class="film-card__controls-item button film-card__controls-item--add-to-watchlist${isWatchList ? markTemplate : ``}">Add to watchlist</button>`
   );
 };
 
@@ -22,10 +22,10 @@ const createFavoriteTemplate = (isFavorite) => {
 };
 
 const createFilmCardTemplate = (filmCard) => {
-  const {title, poster, description, comments, rating, date, duration, genres, isWatchlist, isWatched, isFavorite} = filmCard;
+  const {title, poster, description, comments, rating, date, duration, genres, isWatchList, isWatched, isFavorite} = filmCard;
 
   const watchedTemplate = createWatchedTemplate(isWatched);
-  const watchlistTemplate = createWatchlistTemplate(isWatchlist);
+  const watchListTemplate = createWatchListTemplate(isWatchList);
   const favoriteTemplate = createFavoriteTemplate(isFavorite);
   return (
     `<article class="film-card">
@@ -40,7 +40,7 @@ const createFilmCardTemplate = (filmCard) => {
         <p class="film-card__description">${description}</p>
         <a class="film-card__comments">${comments.length} comments</a>
         <form class="film-card__controls">
-          ${watchlistTemplate}
+          ${watchListTemplate}
           ${watchedTemplate}
           ${favoriteTemplate}
         </form>
@@ -70,8 +70,8 @@ export default class FilmCard extends SmartView {
     return createWatchedTemplate(this._filmCard.isWatched);
   }
 
-  getWatchlistTemplate() {
-    return createWatchlistTemplate(this._filmCard.isWatchlist);
+  getWatchListTemplate() {
+    return createWatchListTemplate(this._filmCard.isWatchList);
   }
 
   _filmCardClickHandler(evt) {

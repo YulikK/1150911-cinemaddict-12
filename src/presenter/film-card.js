@@ -28,7 +28,7 @@ export default class FilmCard {
     this._filmCardComponent = new FilmCardView(film);
     this._filmCardDetailsComponent = new FilmCardDetailsView(film);
 
-    this._setListnersComponent();
+    this._setListenersComponent();
 
     render(this._filmCardContainer, this._filmCardComponent);
 
@@ -47,17 +47,17 @@ export default class FilmCard {
     }
   }
 
-  _setListnersComponent() {
+  _setListenersComponent() {
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick);
     this._filmCardDetailsComponent.setCloseClickHandler(this._handleCloseButtonClick);
     this._filmCardDetailsComponent.setEmojiClickHandler(this._handleEmojiChange);
 
-    this._setCommonListners(this._filmCardComponent);
-    this._setCommonListners(this._filmCardDetailsComponent);
+    this._setCommonListeners(this._filmCardComponent);
+    this._setCommonListeners(this._filmCardDetailsComponent);
 
   }
 
-  _setCommonListners(component) {
+  _setCommonListeners(component) {
     component.setFavoriteClickHandler(this._handleFavoriteClick);
     component.setWatchedClickHandler(this._handleWatchedClick);
     component.setAddWatchListClickHandler(this._handleAddWatchListClick);
@@ -111,7 +111,7 @@ export default class FilmCard {
             {},
             this._film,
             {
-              isWatchlist: !this._film.isWatchlist
+              isWatchList: !this._film.isWatchList
             }
         )
     );
@@ -125,8 +125,8 @@ export default class FilmCard {
     this._hideFilmDetails();
   }
 
-  _handleEmojiChange(newEmogi) {
-    this._filmCardDetailsComponent.changeEmoji(newEmogi);
+  _handleEmojiChange(newEmoji) {
+    this._filmCardDetailsComponent.changeEmoji(newEmoji);
   }
 
   _escKeyDownHandler(evt) {

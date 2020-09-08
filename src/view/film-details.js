@@ -85,9 +85,9 @@ const createWatchedTemplate = (isWatched) => {
   );
 };
 
-const createWatchlistTemplate = (isWatchlist) => {
+const createWatchListTemplate = (isWatchList) => {
   return (
-    `<input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${isWatchlist ? `checked` : ``}>
+    `<input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${isWatchList ? `checked` : ``}>
       <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>`
   );
 };
@@ -100,13 +100,13 @@ const createFavoriteTemplate = (isFavorite) => {
 };
 
 const createFilmCardDetailsTemplate = (filmCard) => {
-  const {title, original, poster, age, description, comments, rating, date, duration, genres, director, writers, actors, country, isWatchlist, isWatched, isFavorite} = filmCard;
+  const {title, original, poster, age, description, comments, rating, date, duration, genres, director, writers, actors, country, isWatchList, isWatched, isFavorite} = filmCard;
   const genresTemplate = genres
     .map((genre) => createGenreTemplate(genre))
     .join(``);
 
   const watchedTemplate = createWatchedTemplate(isWatched);
-  const watchlistTemplate = createWatchlistTemplate(isWatchlist);
+  const watchListTemplate = createWatchListTemplate(isWatchList);
   const favoriteTemplate = createFavoriteTemplate(isFavorite);
 
   return (
@@ -175,7 +175,7 @@ const createFilmCardDetailsTemplate = (filmCard) => {
           </div>
 
           <section class="film-details__controls">
-            ${watchlistTemplate}
+            ${watchListTemplate}
 
             ${watchedTemplate}
 
@@ -224,27 +224,27 @@ export default class FilmCardDetails extends SmartView {
     return createWatchedTemplate(this._filmCard.isWatched);
   }
 
-  getWatchlistTemplate() {
-    return createWatchlistTemplate(this._filmCard.isWatchlist);
+  getWatchListTemplate() {
+    return createWatchListTemplate(this._filmCard.isWatchList);
   }
 
-  _setNewEmoji(newEmogi) {
+  _setNewEmoji(newEmoji) {
     const selectorUpdateElement = `.film-details__add-emoji-label`;
-    const elementTemplate = createAddEmojiTemplate(newEmogi);
+    const elementTemplate = createAddEmojiTemplate(newEmoji);
     const restoreCallback = this._callback.emojiClick;
     this.updateElement(selectorUpdateElement, restoreCallback, elementTemplate);
   }
 
-  _setActiveEmojiItem(newEmogi) {
-    const selectorUpdateElement = `input[id=emoji-${newEmogi}]`;
-    const elementTemplate = createEmotionTemplate(newEmogi, true);
+  _setActiveEmojiItem(newEmoji) {
+    const selectorUpdateElement = `input[id=emoji-${newEmoji}]`;
+    const elementTemplate = createEmotionTemplate(newEmoji, true);
     const restoreCallback = this._callback.emojiClick;
     this.updateElement(selectorUpdateElement, restoreCallback, elementTemplate);
   }
 
-  changeEmoji(newEmogi) {
-    this._setNewEmoji(newEmogi);
-    this._setActiveEmojiItem(newEmogi);
+  changeEmoji(newEmoji) {
+    this._setNewEmoji(newEmoji);
+    this._setActiveEmojiItem(newEmoji);
   }
 
   _closeClickHandler(evt) {

@@ -25,11 +25,11 @@ export default class Smart extends Abstract {
       restoreCallback = this._callback.watchedClick;
       elementTemplate = this.getWatchedTemplate();
 
-    } else if (!prevFilmCard.isWatchlist === this._filmCard.isWatchlist) {
+    } else if (!prevFilmCard.isWatchList === this._filmCard.isWatchList) {
 
       selectorUpdateElement = updateDetails ? `input[id=watchlist]` : `.film-card__controls-item--add-to-watchlist`;
       restoreCallback = this._callback.addWatchListClick;
-      elementTemplate = this.getWatchlistTemplate();
+      elementTemplate = this.getWatchListTemplate();
 
     }
 

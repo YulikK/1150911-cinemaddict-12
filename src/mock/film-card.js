@@ -223,7 +223,7 @@ export const generateFilmCard = () => {
     writers: generateWriters(),
     actors: generateActors(),
     country: generateCountry(),
-    isWatchlist: Boolean(getRandomInteger(0, 1)),
+    isWatchList: Boolean(getRandomInteger(0, 1)),
     isWatched: Boolean(getRandomInteger(0, 1)),
     isFavorite: Boolean(getRandomInteger(0, 1)),
   };
