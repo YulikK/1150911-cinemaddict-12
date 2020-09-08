@@ -17,4 +17,9 @@ export const EMOTIONS = [
   `angry`
 ];
 
+export const Mode = {
+  DEFAULT: `DEFAULT`,
+  DETAILS: `DETAILS`
+};
+
 export const POSTERS_FOLDER = `./images/posters/`;

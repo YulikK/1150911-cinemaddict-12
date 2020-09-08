@@ -1,6 +1,8 @@
 import {getRandomInteger, getRandomFloat} from "../utils/common.js";
 import {EMOTIONS, POSTERS_FOLDER} from "../const.js";
 
+const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+
 const generateTitle = () => {
   const titles = [
     `Made for each other`,
@@ -206,6 +208,7 @@ const generateActors = () => {
 
 export const generateFilmCard = () => {
   return {
+    id: generateId(),
     title: generateTitle(),
     original: generateOriginalName(),
     poster: generatePoster(),
@@ -220,7 +223,7 @@ export const generateFilmCard = () => {
     writers: generateWriters(),
     actors: generateActors(),
     country: generateCountry(),
-    isWatchlist: Boolean(getRandomInteger(0, 1)),
+    isWatchList: Boolean(getRandomInteger(0, 1)),
     isWatched: Boolean(getRandomInteger(0, 1)),
     isFavorite: Boolean(getRandomInteger(0, 1)),
   };
