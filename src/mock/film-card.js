@@ -123,7 +123,7 @@ const generateRating = () => {
 
 const generateDuration = () => {
 
-  return getRandomFloat(1, 2);
+  return getRandomFloat(15, 150, 0);
 
 };
 
