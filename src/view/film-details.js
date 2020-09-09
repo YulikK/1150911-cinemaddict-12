@@ -1,4 +1,4 @@
-import {humanizeFilmDuration, humanizeFilmDate} from "../utils/film-card.js";
+import {formatFilmDuration, formatFilmDate} from "../utils/film-card.js";
 import {EMOTIONS} from "../const.js";
 import SmartView from "./smart.js";
 
@@ -21,7 +21,7 @@ const createCommentTemplate = (comment) => {
         <p class="film-details__comment-text">${text}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${autor}</span>
-          <span class="film-details__comment-day">${humanizeFilmDate(date)}</span>
+          <span class="film-details__comment-day">${formatFilmDate(date, `YYYY/MM/DD HH:MM`)}</span>
           <button class="film-details__comment-delete">Delete</button>
         </p>
       </div>
@@ -150,11 +150,11 @@ const createFilmCardDetailsTemplate = (filmCard) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${humanizeFilmDate(date)}</td>
+                  <td class="film-details__cell">${formatFilmDate(date, `D MMMM YYYY`)}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
-                  <td class="film-details__cell">${humanizeFilmDuration(duration)}</td>
+                  <td class="film-details__cell">${formatFilmDuration(duration)}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Country</td>
