@@ -206,7 +206,7 @@ const generateActors = () => {
   return actors;
 };
 
-export const generateFilmCard = () => {
+export const generateMovie = () => {
   return {
     id: generateId(),
     title: generateTitle(),

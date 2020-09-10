@@ -1,5 +1,5 @@
 import SmartView from "./smart.js";
-import {formatFilmDuration, formatFilmDate} from "../utils/film-card.js";
+import {formatMovieDuration, formatMovieDate} from "../utils/movie.js";
 
 const markTemplate = ` film-card__controls-item--active`;
 
@@ -21,8 +21,8 @@ const createFavoriteTemplate = (isFavorite) => {
   );
 };
 
-const createFilmCardTemplate = (filmCard) => {
-  const {title, poster, description, comments, rating, date, duration, genres, isWatchList, isWatched, isFavorite} = filmCard;
+const createMovieTemplate = (movie) => {
+  const {title, poster, description, comments, rating, date, duration, genres, isWatchList, isWatched, isFavorite} = movie;
 
   const watchedTemplate = createWatchedTemplate(isWatched);
   const watchListTemplate = createWatchListTemplate(isWatchList);
@@ -32,8 +32,8 @@ const createFilmCardTemplate = (filmCard) => {
         <h3 class="film-card__title">${title}</h3>
         <p class="film-card__rating">${rating}</p>
         <p class="film-card__info">
-          <span class="film-card__year">${formatFilmDate(date, `YYYY`)}</span>
-          <span class="film-card__duration">${formatFilmDuration(duration)}</span>
+          <span class="film-card__year">${formatMovieDate(date, `YYYY`)}</span>
+          <span class="film-card__duration">${formatMovieDuration(duration)}</span>
           <span class="film-card__genre">${genres[0]}</span>
         </p>
         <img src="${poster}" alt="" class="film-card__poster">
@@ -48,35 +48,35 @@ const createFilmCardTemplate = (filmCard) => {
   );
 };
 
-export default class FilmCard extends SmartView {
-  constructor(filmCard) {
+export default class Movie extends SmartView {
+  constructor(movie) {
     super();
-    this._filmCard = filmCard;
-    this._filmCardClickHandler = this._filmCardClickHandler.bind(this);
+    this._movie = movie;
+    this._movieClickHandler = this._movieClickHandler.bind(this);
     this._watchedClickHandler = this._watchedClickHandler.bind(this);
     this._addWatchListClickHandler = this._addWatchListClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   getTemplate() {
-    return createFilmCardTemplate(this._filmCard);
+    return createMovieTemplate(this._movie);
   }
 
   getFavoriteTemplate() {
-    return createFavoriteTemplate(this._filmCard.isFavorite);
+    return createFavoriteTemplate(this._movie.isFavorite);
   }
 
   getWatchedTemplate() {
-    return createWatchedTemplate(this._filmCard.isWatched);
+    return createWatchedTemplate(this._movie.isWatched);
   }
 
   getWatchListTemplate() {
-    return createWatchListTemplate(this._filmCard.isWatchList);
+    return createWatchListTemplate(this._movie.isWatchList);
   }
 
-  _filmCardClickHandler(evt) {
+  _movieClickHandler(evt) {
     evt.preventDefault();
-    this._callback.filmCardClick();
+    this._callback.movieClick();
   }
 
   _favoriteClickHandler(evt) {
@@ -94,11 +94,11 @@ export default class FilmCard extends SmartView {
     this._callback.addWatchListClick();
   }
 
-  setFilmCardClickHandler(callback) {
-    this._callback.filmCardClick = callback;
-    this.getElement().querySelector(`.film-card__poster`).addEventListener(`click`, this._filmCardClickHandler);
-    this.getElement().querySelector(`.film-card__title`).addEventListener(`click`, this._filmCardClickHandler);
-    this.getElement().querySelector(`.film-card__comments`).addEventListener(`click`, this._filmCardClickHandler);
+  setMovieClickHandler(callback) {
+    this._callback.movieClick = callback;
+    this.getElement().querySelector(`.film-card__poster`).addEventListener(`click`, this._movieClickHandler);
+    this.getElement().querySelector(`.film-card__title`).addEventListener(`click`, this._movieClickHandler);
+    this.getElement().querySelector(`.film-card__comments`).addEventListener(`click`, this._movieClickHandler);
   }
 
   setFavoriteClickHandler(callback) {

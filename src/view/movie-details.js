@@ -1,4 +1,4 @@
-import {formatFilmDuration, formatFilmDate} from "../utils/film-card.js";
+import {formatMovieDuration, formatMovieDate} from "../utils/movie.js";
 import {EMOTIONS} from "../const.js";
 import SmartView from "./smart.js";
 
@@ -21,7 +21,7 @@ const createCommentTemplate = (comment) => {
         <p class="film-details__comment-text">${text}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${autor}</span>
-          <span class="film-details__comment-day">${formatFilmDate(date, `YYYY/MM/DD HH:MM`)}</span>
+          <span class="film-details__comment-day">${formatMovieDate(date, `YYYY/MM/DD HH:MM`)}</span>
           <button class="film-details__comment-delete">Delete</button>
         </p>
       </div>
@@ -99,8 +99,8 @@ const createFavoriteTemplate = (isFavorite) => {
   );
 };
 
-const createFilmCardDetailsTemplate = (filmCard) => {
-  const {title, original, poster, age, description, comments, rating, date, duration, genres, director, writers, actors, country, isWatchList, isWatched, isFavorite} = filmCard;
+const createMovieDetailsTemplate = (movie) => {
+  const {title, original, poster, age, description, comments, rating, date, duration, genres, director, writers, actors, country, isWatchList, isWatched, isFavorite} = movie;
   const genresTemplate = genres
     .map((genre) => createGenreTemplate(genre))
     .join(``);
@@ -150,11 +150,11 @@ const createFilmCardDetailsTemplate = (filmCard) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${formatFilmDate(date, `D MMMM YYYY`)}</td>
+                  <td class="film-details__cell">${formatMovieDate(date, `D MMMM YYYY`)}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
-                  <td class="film-details__cell">${formatFilmDuration(duration)}</td>
+                  <td class="film-details__cell">${formatMovieDuration(duration)}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Country</td>
@@ -201,10 +201,10 @@ const createFilmCardDetailsTemplate = (filmCard) => {
   );
 };
 
-export default class FilmCardDetails extends SmartView {
-  constructor(filmCard) {
+export default class MovieDetails extends SmartView {
+  constructor(movie) {
     super();
-    this._filmCard = filmCard;
+    this._movie = movie;
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._watchedClickHandler = this._watchedClickHandler.bind(this);
     this._addWatchListClickHandler = this._addWatchListClickHandler.bind(this);
@@ -213,19 +213,19 @@ export default class FilmCardDetails extends SmartView {
   }
 
   getTemplate() {
-    return createFilmCardDetailsTemplate(this._filmCard);
+    return createMovieDetailsTemplate(this._movie);
   }
 
   getFavoriteTemplate() {
-    return createFavoriteTemplate(this._filmCard.isFavorite);
+    return createFavoriteTemplate(this._movie.isFavorite);
   }
 
   getWatchedTemplate() {
-    return createWatchedTemplate(this._filmCard.isWatched);
+    return createWatchedTemplate(this._movie.isWatched);
   }
 
   getWatchListTemplate() {
-    return createWatchListTemplate(this._filmCard.isWatchList);
+    return createWatchListTemplate(this._movie.isWatchList);
   }
 
   _setNewEmoji(newEmoji) {
@@ -249,7 +249,7 @@ export default class FilmCardDetails extends SmartView {
 
   _closeClickHandler(evt) {
     evt.preventDefault();
-    this._callback.closeClick(this._filmCard);
+    this._callback.closeClick(this._movie);
   }
 
   _favoriteClickHandler(evt) {
