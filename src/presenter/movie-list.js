@@ -11,7 +11,8 @@ import {SortType} from "../const.js";
 import {sortByDate, sortByRating} from "../utils/film-card.js";
 
 export default class MovieList {
-  constructor(movieContainer, movieDetailsContainer) {
+  constructor(movieContainer, movieDetailsContainer, moviesModel) {
+    this._moviesModel = moviesModel;
     this._movieContainer = movieContainer;
     this._movieDetailsContainer = movieDetailsContainer;
     this._filmsListComponent = new FilmsListView();
@@ -40,6 +41,10 @@ export default class MovieList {
     render(this._filmsListComponent, this._filmsListContainerComponent);
 
     this._renderBoard();
+  }
+
+  _getMovies() {
+    return this._moviesModel.getMovies();
   }
 
   _handleFilmCardChange(updatedFilm) {
