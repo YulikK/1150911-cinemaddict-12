@@ -32,6 +32,14 @@ export const UserAction = {
 
 export const UpdateType = {
   PATCH: `PATCH`,
+  PATCH_CARD: `PATCH CARD`,
   MINOR: `MINOR`,
   MAJOR: `MAJOR`
+};
+
+export const FilterType = {
+  ALL: `all`,
+  WATCHLIST: `watchList`,
+  HISTORY: `history`,
+  FAVORITES: `favorites`
 };

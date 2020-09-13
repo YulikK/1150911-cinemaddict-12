@@ -1,21 +1,25 @@
 import {CARD_COUNT_PER_STEP} from "../const.js";
 import MoviePresenter from "./movie.js";
 import SortView from "../view/sort.js";
-import MovieListView from "../view/movies.js";
+import MovieSectionView from "../view/movies.js";
+import MovieListView from "../view/movie-list.js";
 import NoMovieView from "../view/no-movie.js";
 import MovieListContainerView from "../view/movie-container.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
 import {render, remove} from "../utils/render.js";
-import {SortType, UpdateType, UserAction} from "../const.js";
+import {filter} from "../utils/filter.js";
 import {sortByDate, sortByRating} from "../utils/movie.js";
+import {SortType, UpdateType, UserAction} from "../const.js";
 
 export default class MovieList {
-  constructor(movieContainer, movieDetailsContainer, moviesModel) {
+  constructor(movieContainer, movieDetailsContainer, moviesModel, filterModel) {
 
     this._moviesModel = moviesModel;
+    this._filterModel = filterModel;
     this._movieContainer = movieContainer;
     this._movieDetailsContainer = movieDetailsContainer;
 
+    this._movieSectionComponent = new MovieSectionView();
     this._movieListComponent = new MovieListView();
     this._movieListContainerComponent = new MovieListContainerView();
     this._noMovieComponent = new NoMovieView();
@@ -35,6 +39,7 @@ export default class MovieList {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
     this._moviesModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -44,26 +49,23 @@ export default class MovieList {
   }
 
   _getMovies() {
+    const filterType = this._filterModel.getFilter();
+    const movies = this._moviesModel.getMovies();
+    const filtredMovies = filter[filterType](movies);
+
     switch (this._currentSortType) {
       case SortType.BY_DATE:
-        return this._moviesModel.getMovies().slice().sort(sortByDate);
+        return filtredMovies.sort(sortByDate);
       case SortType.BY_RATING:
-        return this._moviesModel.getMovies().slice().sort(sortByRating);
+        return filtredMovies.sort(sortByRating);
     }
-    return this._moviesModel.getMovies();
+    return filtredMovies;
   }
 
   _handleViewAction(actionType, updateType, update) {
-    // this._moviePresenter[updatedMovie.id].update(updatedMovie);
     switch (actionType) {
       case UserAction.UPDATE:
         this._moviesModel.updateMovie(updateType, update);
-        break;
-      case UserAction.ADD:
-        // this._tasksModel.addTask(updateType, update);///**оставлю для реализации комментариев */
-        break;
-      case UserAction.DELETE:
-        // this._tasksModel.deleteTask(updateType, update);
         break;
     }
   }
@@ -73,13 +75,14 @@ export default class MovieList {
       case UpdateType.PATCH:
         this._moviePresenter[data.id].update(data);
         break;
+      case UpdateType.PATCH_CARD:
+        this._moviePresenter[data.id].updateCard(data);
+        break;
       case UpdateType.MINOR:
-        // - обновить список (например, когда задача ушла в архив)
         this._clearBoard();
         this._renderBoard();
         break;
       case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
         this._clearBoard({resetRenderedMovieCount: true, resetSortType: true});
         this._renderBoard();
         break;
@@ -118,7 +121,14 @@ export default class MovieList {
   }
 
   _renderMovie(movie) {
-    const moviePresenter = new MoviePresenter(this._movieListContainerComponent, this._movieDetailsContainer, this._handleViewAction, this._handleModeChange);
+    const moviePresenter = new MoviePresenter(
+        this._movieListContainerComponent,
+        this._movieDetailsContainer,
+        this._handleViewAction,
+        this._handleModeChange,
+        this._filterModel.getFilter()
+    );
+
     moviePresenter.init(movie);
     this._moviePresenter[movie.id] = moviePresenter;
   }
@@ -194,7 +204,9 @@ export default class MovieList {
     }
 
     this._renderSort();
-    render(this._movieContainer, this._movieListComponent);
+
+    render(this._movieContainer, this._movieSectionComponent);
+    render(this._movieSectionComponent, this._movieListComponent);
     render(this._movieListComponent, this._movieListContainerComponent);
 
     // Теперь, когда _renderBoard рендерит доску не только на старте,

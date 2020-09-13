@@ -31,6 +31,13 @@ export default class Smart extends Abstract {
       restoreCallback = this._callback.addWatchListClick;
       elementTemplate = this.getWatchListTemplate();
 
+    } else if (prevMovie.comments !== this._movie.comments) {
+
+      selectorUpdateElement = `.film-card__comments`;
+      restoreCallback = this._callback.movieClick;
+      elementTemplate = this.getCommentsTemplate();
+
+
     }
 
     this.updateElement(selectorUpdateElement, restoreCallback, elementTemplate);

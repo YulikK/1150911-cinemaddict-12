@@ -1,4 +1,5 @@
 import moment from "moment";
+import {getRandomInteger} from "../utils/common.js";
 
 export const formatMovieDuration = (duration) => {
   const hours = moment.duration(duration, `minutes`).hours();
@@ -48,4 +49,13 @@ export const sortByRating = (movieA, movieB) => {
   }
 
   return movieB.rating - movieA.rating;
+};
+
+export const getRandomName = () => {
+  const autors = [
+    `Igor`,
+    `Maks`,
+    `Anna`
+  ];
+  return autors[getRandomInteger(0, autors.length - 1)];
 };

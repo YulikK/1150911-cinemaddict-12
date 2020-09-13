@@ -21,12 +21,19 @@ const createFavoriteTemplate = (isFavorite) => {
   );
 };
 
+const createCommentsTemplate = (comments) => {
+  return (
+    `<a class="film-card__comments">${comments.length} comments</a>`
+  );
+};
+
 const createMovieTemplate = (movie) => {
   const {title, poster, description, comments, rating, date, duration, genres, isWatchList, isWatched, isFavorite} = movie;
 
   const watchedTemplate = createWatchedTemplate(isWatched);
   const watchListTemplate = createWatchListTemplate(isWatchList);
   const favoriteTemplate = createFavoriteTemplate(isFavorite);
+  const commentsTemplate = createCommentsTemplate(comments);
   return (
     `<article class="film-card">
         <h3 class="film-card__title">${title}</h3>
@@ -38,7 +45,7 @@ const createMovieTemplate = (movie) => {
         </p>
         <img src="${poster}" alt="" class="film-card__poster">
         <p class="film-card__description">${description}</p>
-        <a class="film-card__comments">${comments.length} comments</a>
+        ${commentsTemplate}
         <form class="film-card__controls">
           ${watchListTemplate}
           ${watchedTemplate}
@@ -72,6 +79,10 @@ export default class Movie extends SmartView {
 
   getWatchListTemplate() {
     return createWatchListTemplate(this._movie.isWatchList);
+  }
+
+  getCommentsTemplate() {
+    return createCommentsTemplate(this._movie.comments);
   }
 
   _movieClickHandler(evt) {

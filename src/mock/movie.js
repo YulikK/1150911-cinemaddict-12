@@ -1,7 +1,7 @@
 import {getRandomInteger, getRandomFloat} from "../utils/common.js";
 import {EMOTIONS, POSTERS_FOLDER} from "../const.js";
 
-const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+export const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
 const generateTitle = () => {
   const titles = [
@@ -104,6 +104,7 @@ const generateComments = () => {
   for (let i = 0; i < commentsCount; i++) {
     comments.push(
         {
+          id: generateId(),
           autor: autors[getRandomInteger(0, autors.length - 1)],
           text: texts[getRandomInteger(0, texts.length - 1)],
           emotion: EMOTIONS[getRandomInteger(0, EMOTIONS.length - 1)],
