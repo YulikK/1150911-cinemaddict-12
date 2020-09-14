@@ -1,6 +1,7 @@
 import FilterView from "../view/filter.js";
 import {render, replace, remove} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
+import {ucFirst} from "../utils/common.js";
 import {FilterType, UpdateType} from "../const.js";
 
 export default class Filter {
@@ -53,27 +54,12 @@ export default class Filter {
   _getFilters() {
     const movies = this._moviesModel.getMovies();
 
-    return [
-      {
-        type: FilterType.ALL,
-        name: `All`,
-        count: filter[FilterType.ALL](movies).length
-      },
-      {
-        type: FilterType.WATCHLIST,
-        name: `WatchList`,
-        count: filter[FilterType.WATCHLIST](movies).length
-      },
-      {
-        type: FilterType.HISTORY,
-        name: `History`,
-        count: filter[FilterType.HISTORY](movies).length
-      },
-      {
-        type: FilterType.FAVORITES,
-        name: `Favorites`,
-        count: filter[FilterType.FAVORITES](movies).length
-      }
-    ];
+    return Object.keys(FilterType).map((filterType) => {
+      return {
+        type: FilterType[filterType],
+        name: ucFirst(FilterType[filterType]),
+        count: filter[FilterType[filterType]](movies).length
+      };
+    });
   }
 }

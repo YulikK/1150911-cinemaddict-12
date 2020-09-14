@@ -16,14 +16,14 @@ const movies = new Array(CARD_COUNT).fill().map(generateMovie);
 const allMovies = generateCountMovies();
 
 const moviesModel = new MoviesModel();
-moviesModel.setMovies(movies);
-
 const filterModel = new FilterModel();
 
 const siteBodyElement = document.querySelector(`body`);
 const siteHeaderElement = siteBodyElement.querySelector(`.header`);
 const siteMainElement = siteBodyElement.querySelector(`.main`);
 const siteFooterElement = siteBodyElement.querySelector(`.footer`);
+
+moviesModel.setMovies(movies);
 
 render(siteHeaderElement, new ProfileView(filter[FilterType.HISTORY](moviesModel.getMovies()).length));
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, moviesModel);

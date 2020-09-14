@@ -16,3 +16,5 @@ export const ucFirst = (str) => {
   const firstLetter = str.substr(0, 1);
   return firstLetter.toUpperCase() + str.substr(1);
 };
+
+export const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);

@@ -2,7 +2,7 @@ import MovieView from "../view/movie.js";
 import MovieDetailsView from "../view/movie-details.js";
 import CommentsView from "../view/comments.js";
 import CommentsModel from "../model/comments.js";
-import {generateId} from "../mock/movie.js";
+import {generateId} from "../utils/common.js";
 import {render, hideDetails, showDetails, remove} from "../utils/render.js";
 import {getRandomName} from "../utils/movie.js";
 import {Mode, UserAction, UpdateType, FilterType} from "../const.js";

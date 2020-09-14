@@ -182,9 +182,6 @@ export default class MovieList {
     if (resetRenderedMovieCount) {
       this._renderedMovieCount = CARD_COUNT_PER_STEP;
     } else {
-      // На случай, если перерисовка доски вызвана
-      // уменьшением количества задач (например, удаление или перенос в архив)
-      // нужно скорректировать число показанных задач
       this._renderedMovieCount = Math.min(movieCount, this._renderedMovieCount);
     }
 
@@ -209,10 +206,6 @@ export default class MovieList {
     render(this._movieSectionComponent, this._movieListComponent);
     render(this._movieListComponent, this._movieListContainerComponent);
 
-    // Теперь, когда _renderBoard рендерит доску не только на старте,
-    // но и по ходу работы приложения, нужно заменить
-    // константу CARD_COUNT_PER_STEP на свойство _renderedMovieCount,
-    // чтобы в случае перерисовки сохранить N-показанных карточек
     this._renderMovies(movies.slice(0, Math.min(movieCount, this._renderedMovieCount)));
 
     if (movieCount > this._renderedMovieCount) {
