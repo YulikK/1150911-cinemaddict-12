@@ -1,12 +1,7 @@
 import {RATING} from "../const.js";
 import AbstractView from "./abstract.js";
 
-const getRating = (filters) => {
-
-  const countWatched = filters.find(
-      (filter) => {
-        return filter.name === `history`;
-      }).count;
+const getRating = (watched) => {
 
   let ratingProfile = ``;
 
@@ -14,7 +9,7 @@ const getRating = (filters) => {
 
   keys.forEach((key) => {
 
-    if (key <= countWatched) {
+    if (key <= watched) {
       ratingProfile = RATING[key];
     }
 
@@ -24,8 +19,8 @@ const getRating = (filters) => {
 
 };
 
-const createProfileTemplate = (filters) => {
-  const rating = getRating(filters);
+const createProfileTemplate = (watched) => {
+  const rating = getRating(watched);
   return (
     `<section class="header__profile profile">
       <p class="profile__rating">${rating}</p>
@@ -35,13 +30,13 @@ const createProfileTemplate = (filters) => {
 };
 
 export default class Profile extends AbstractView {
-  constructor(filters) {
+  constructor(watched) {
     super();
-    this._filters = filters;
+    this._watched = watched;
   }
 
   getTemplate() {
-    return createProfileTemplate(this._filters);
+    return createProfileTemplate(this._watched);
   }
 
 }

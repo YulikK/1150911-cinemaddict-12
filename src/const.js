@@ -23,3 +23,23 @@ export const Mode = {
 };
 
 export const POSTERS_FOLDER = `./images/posters/`;
+
+export const UserAction = {
+  UPDATE: `UPDATE`,
+  ADD: `ADD`,
+  DELETE: `DELETE`
+};
+
+export const UpdateType = {
+  PATCH: `PATCH`,
+  PATCH_CARD: `PATCH CARD`,
+  MINOR: `MINOR`,
+  MAJOR: `MAJOR`
+};
+
+export const FilterType = {
+  ALL: `all`,
+  WATCHLIST: `watchList`,
+  HISTORY: `history`,
+  FAVORITES: `favorites`
+};

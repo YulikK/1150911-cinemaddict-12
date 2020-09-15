@@ -1,12 +1,13 @@
 import moment from "moment";
+import {getRandomInteger} from "../utils/common.js";
 
-export const formatFilmDuration = (duration) => {
+export const formatMovieDuration = (duration) => {
   const hours = moment.duration(duration, `minutes`).hours();
   const minutes = moment.duration(duration, `minutes`).minutes();
   return `${hours === 0 ? `` : hours}${hours === 0 ? `` : `h `}${minutes}m`;
 };
 
-export const formatFilmDate = (date, format) => {
+export const formatMovieDate = (date, format) => {
   if (!(date instanceof Date)) {
     return ``;
   }
@@ -29,23 +30,32 @@ const getWeightForNullDate = (dateA, dateB) => {
   return null;
 };
 
-export const sortByDate = (filmA, filmB) => {
+export const sortByDate = (movieA, movieB) => {
 
-  const weight = getWeightForNullDate(filmA.date, filmB.date);
+  const weight = getWeightForNullDate(movieA.date, movieB.date);
 
   if (weight !== null) {
     return weight;
   }
 
-  return filmA.date.getTime() - filmB.date.getTime();
+  return movieA.date.getTime() - movieB.date.getTime();
 };
 
-export const sortByRating = (filmA, filmB) => {
-  const weight = getWeightForNullDate(filmA.rating, filmB.rating);
+export const sortByRating = (movieA, movieB) => {
+  const weight = getWeightForNullDate(movieA.rating, movieB.rating);
 
   if (weight !== null) {
     return weight;
   }
 
-  return filmB.rating - filmA.rating;
+  return movieB.rating - movieA.rating;
+};
+
+export const getRandomName = () => {
+  const autors = [
+    `Igor`,
+    `Maks`,
+    `Anna`
+  ];
+  return autors[getRandomInteger(0, autors.length - 1)];
 };
