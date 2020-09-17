@@ -1,4 +1,5 @@
 import {ucFirst} from "../utils/common.js";
+import {MenuItem} from "../const.js";
 import AbstractView from "./abstract.js";
 
 const createFilterItemTemplate = (filter, currentFilterType) => {
@@ -22,7 +23,6 @@ const createNavigationTemplate = (filterItems, currentFilterType) => {
       <div class="main-navigation__items">
         ${filterItemsTemplate}
       </div>
-      <a href="#stats" class="main-navigation__additional">Stats</a>
     </nav>`
   );
 };
@@ -35,6 +35,7 @@ export default class Navigation extends AbstractView {
     this._currentFilter = currentFilterType;
 
     this._filterTypeClickHandler = this._filterTypeClickHandler.bind(this);
+    this._filterClickHandler = this._filterClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -50,9 +51,23 @@ export default class Navigation extends AbstractView {
     this._callback.filterTypeChange(evt.target.dataset.filterType);
   }
 
+  _filterClickHandler(evt) {
+    if (evt.target.tagName !== `A`) {
+      return;
+    }
+
+    evt.preventDefault();
+    this._callback.filterClick(MenuItem.MOVIES);
+  }
+
   setFilterTypeChangeHandler(callback) {
     this._callback.filterTypeChange = callback;
     this.getElement().addEventListener(`click`, this._filterTypeClickHandler);
+  }
+
+  setFilterClikHandler(callback) {
+    this._callback.filterClick = callback;
+    this.getElement().querySelector(`.main-navigation__items`).addEventListener(`click`, this._filterClickHandler);
   }
 
 }
