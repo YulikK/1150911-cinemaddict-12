@@ -1,18 +1,17 @@
-
 import SmartView from "./smart.js";
-import {ucFirst, makeItemsUniq} from "../utils/common.js";
+import {ucFirst, makeItemsUnique} from "../utils/common.js";
 import {getWatchedMovieInTime, getCountWatchedMovieByGenre, countDuration, getHours, getMinuts} from "../utils/statistics.js";
 import {StatisticsType, BAR_HEIGHT} from "../const.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-const renderGenresChart = (genresCtx, uniqGenres, countMovies) => {
+const renderGenresChart = (genresCtx, uniqueGenres, countMovies) => {
 
   return new Chart(genresCtx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: uniqGenres,
+      labels: uniqueGenres,
       datasets: [{
         data: countMovies,
         backgroundColor: `#ffe800`,
@@ -83,9 +82,9 @@ const createStatisticsTemplate = (data) => {
   const durationH = getHours(countDurationWatched);
   const durationM = getMinuts(countDurationWatched);
   const movieGenres = [].concat(...moviesWatched.map((movie) => movie.genres));
-  const uniqGenres = makeItemsUniq(movieGenres);
-  const countMovies = uniqGenres.map((genre) => getCountWatchedMovieByGenre(moviesWatched, genre));
-  const topGenre = moviesWatched.length === 0 ? `` : uniqGenres[countMovies.indexOf(Math.max(...countMovies))];
+  const uniqueGenres = makeItemsUnique(movieGenres);
+  const countMovies = uniqueGenres.map((genre) => getCountWatchedMovieByGenre(moviesWatched, genre));
+  const topGenre = moviesWatched.length === 0 ? `` : uniqueGenres[countMovies.indexOf(Math.max(...countMovies))];
 
   return (
     `<section class="statistic">
@@ -203,14 +202,14 @@ export default class Statistic extends SmartView {
 
     const moviesWatched = movies.filter((movie) => getWatchedMovieInTime(movie, filterType));
     const movieGenres = [].concat(...moviesWatched.map((movie) => movie.genres));
-    const uniqGenres = makeItemsUniq(movieGenres);
-    const countMovies = uniqGenres.map((genre) => getCountWatchedMovieByGenre(moviesWatched, genre));
+    const uniqueGenres = makeItemsUnique(movieGenres);
+    const countMovies = uniqueGenres.map((genre) => getCountWatchedMovieByGenre(moviesWatched, genre));
 
+    if (uniqueGenres.length !== 0) {
 
-    if (uniqGenres.length !== 0) {
-      this._genresCart = renderGenresChart(genresCtx, uniqGenres, countMovies);
-      this._genresCart.height = BAR_HEIGHT * uniqGenres.length;
-      genresCtx.height = BAR_HEIGHT * uniqGenres.length;
+      genresCtx.height = BAR_HEIGHT * uniqueGenres.length;
+      this._genresCart = renderGenresChart(genresCtx, uniqueGenres, countMovies);
+
     }
   }
 

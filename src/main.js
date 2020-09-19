@@ -50,9 +50,11 @@ const handleSiteMenuClick = (newMenuItem) => {
     case MenuItem.MOVIES:
       remove(statisticsComponent);
       movieListPresenter.init();
+      filterPresenter.setActiveMenuItem(menuItem);
       break;
     case MenuItem.STATISTICS:
       movieListPresenter.destroy();
+      filterPresenter.setActiveMenuItem(menuItem);
       statisticsComponent = new StatisticsView(moviesModel.getMovies());
       render(siteMainElement, statisticsComponent);
       break;

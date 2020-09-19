@@ -3,7 +3,7 @@ import StatsView from "../view/stats.js";
 import {render, replace, remove} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
 import {ucFirst} from "../utils/common.js";
-import {FilterType, UpdateType} from "../const.js";
+import {FilterType, UpdateType, MenuItem} from "../const.js";
 
 export default class Filter {
   constructor(filterContainer, filterModel, moviesModel) {
@@ -81,4 +81,17 @@ export default class Filter {
     this._statsComponent.setClickHandler(callback);
     this._changeMenuItem = callback;
   }
+
+  setActiveMenuItem(menuItem) {
+    switch (menuItem) {
+      case MenuItem.MOVIES:
+        this._statsComponent.removeActiveMenuElement();
+        break;
+      case MenuItem.STATISTICS:
+        this._filterModel.setFilter(UpdateType.MAJOR, null);
+        this._statsComponent.setActiveMenuElement();
+        break;
+    }
+  }
+
 }

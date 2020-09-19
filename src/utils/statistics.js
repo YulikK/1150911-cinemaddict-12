@@ -15,6 +15,8 @@ export const getWatchedMovieInTime = (movie, filterType) => {
   const currentDate = getCurrentDate();
   let time = null;
   switch (filterType) {
+    case StatisticsType.ALL:
+      return true;
     case StatisticsType.TODAY:
       time = `day`;
       break;
@@ -29,7 +31,7 @@ export const getWatchedMovieInTime = (movie, filterType) => {
       break;
   }
 
-  return filterType === StatisticsType.ALL ? true : moment(movie.watchingDate).isSame(currentDate, time);
+  return moment(movie.watchingDate).isSame(currentDate, time);
 
 };
 

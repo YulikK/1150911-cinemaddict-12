@@ -26,4 +26,4 @@ export const getCurrentDate = () => {
   return new Date(currentDate);
 };
 
-export const makeItemsUniq = (items) => [...new Set(items)];
+export const makeItemsUnique = (items) => [...new Set(items)];

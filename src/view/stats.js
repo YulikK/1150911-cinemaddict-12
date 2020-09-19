@@ -1,4 +1,3 @@
-
 import AbstractView from "./abstract.js";
 import {MenuItem} from "../const.js";
 
@@ -22,6 +21,18 @@ export default class Statis extends AbstractView {
   _menuClickHandler(evt) {
     evt.preventDefault();
     this._callback.menuClick(MenuItem.STATISTICS);
+  }
+
+  setActiveMenuElement() {
+
+    this.getElement().classList.add(`main-navigation__additional--active`);
+
+  }
+
+  removeActiveMenuElement() {
+
+    this.getElement().classList.remove(`main-navigation__additional--active`);
+
   }
 
   setClickHandler(callback) {

@@ -35,7 +35,6 @@ export default class Navigation extends AbstractView {
     this._currentFilter = currentFilterType;
 
     this._filterTypeClickHandler = this._filterTypeClickHandler.bind(this);
-    this._filterClickHandler = this._filterClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -49,25 +48,20 @@ export default class Navigation extends AbstractView {
 
     evt.preventDefault();
     this._callback.filterTypeChange(evt.target.dataset.filterType);
-  }
-
-  _filterClickHandler(evt) {
-    if (evt.target.tagName !== `A`) {
-      return;
+    if (this._currentFilter === null) {
+      this._callback.menuItemClick(MenuItem.MOVIES);
     }
 
-    evt.preventDefault();
-    this._callback.filterClick(MenuItem.MOVIES);
+
   }
 
   setFilterTypeChangeHandler(callback) {
     this._callback.filterTypeChange = callback;
-    this.getElement().addEventListener(`click`, this._filterTypeClickHandler);
+    this.getElement().querySelector(`.main-navigation__items`).addEventListener(`click`, this._filterTypeClickHandler);
   }
 
   setFilterClikHandler(callback) {
-    this._callback.filterClick = callback;
-    this.getElement().querySelector(`.main-navigation__items`).addEventListener(`click`, this._filterClickHandler);
+    this._callback.menuItemClick = callback;
   }
 
 }

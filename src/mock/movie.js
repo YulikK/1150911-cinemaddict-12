@@ -1,4 +1,4 @@
-import {getRandomInteger, getRandomFloat, generateId, makeItemsUniq} from "../utils/common.js";
+import {getRandomInteger, getRandomFloat, generateId, makeItemsUnique} from "../utils/common.js";
 import {EMOTIONS, POSTERS_FOLDER} from "../const.js";
 
 
@@ -83,7 +83,7 @@ const generateDate = () => {
   return new Date(currentDate);
 };
 
-const generateWathsedDate = (isWatched) => {
+const generateWatchedDate = (isWatched) => {
   if (!isWatched) {
     return null;
   }
@@ -160,7 +160,7 @@ const generateGenre = () => {
   for (let i = 0; i < randomCount; i++) {
     genre.push(genres[getRandomInteger(0, genres.length - 1)]);
   }
-  return makeItemsUniq(genre);
+  return makeItemsUnique(genre);
 };
 
 const generateDirector = () => {
@@ -241,7 +241,7 @@ export const generateMovie = () => {
     country: generateCountry(),
     isWatchList: Boolean(getRandomInteger(0, 1)),
     isWatched,
-    watchingDate: generateWathsedDate(isWatched),
+    watchingDate: generateWatchedDate(isWatched),
     isFavorite: Boolean(getRandomInteger(0, 1)),
   };
 };
