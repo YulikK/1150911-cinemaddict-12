@@ -6,23 +6,26 @@ import MovieListView from "../view/movie-list.js";
 import NoMovieView from "../view/no-movie.js";
 import MovieListContainerView from "../view/movie-container.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
+import LoadingView from "../view/loading.js";
 import {render, remove} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
 import {sortByDate, sortByRating} from "../utils/movie.js";
 import {SortType, UpdateType, UserAction} from "../const.js";
 
 export default class MovieList {
-  constructor(movieContainer, movieDetailsContainer, moviesModel, filterModel) {
+  constructor(movieContainer, movieDetailsContainer, moviesModel, filterModel, api) {
 
     this._moviesModel = moviesModel;
     this._filterModel = filterModel;
     this._movieContainer = movieContainer;
     this._movieDetailsContainer = movieDetailsContainer;
+    this._api = api;
 
     this._movieSectionComponent = new MovieSectionView();
     this._movieListComponent = new MovieListView();
     this._movieListContainerComponent = new MovieListContainerView();
     this._noMovieComponent = new NoMovieView();
+    this._loadingComponent = new LoadingView();
 
     this._sortComponent = null;
     this._showMoreButtonComponent = null;
@@ -31,6 +34,7 @@ export default class MovieList {
     this._currentSortType = SortType.DEFAULT;
 
     this._moviePresenter = {};
+    this._isLoading = true;
 
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
@@ -77,7 +81,16 @@ export default class MovieList {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE:
-        this._moviesModel.updateMovie(updateType, update);
+        this._api.updateMovie(update)
+        .then((movie) =>
+          this._api.getComments(movie)
+          .then((comments) => {
+            movie.comments = comments;
+            return movie;
+          })
+          .then((movieUpdate) => {
+            this._moviesModel.updateMovie(updateType, movieUpdate);
+          }));
         break;
     }
   }
@@ -96,6 +109,11 @@ export default class MovieList {
         break;
       case UpdateType.MAJOR:
         this._clearBoard({resetRenderedMovieCount: true, resetSortType: true});
+        this._renderBoard();
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
         this._renderBoard();
         break;
     }
@@ -153,6 +171,10 @@ export default class MovieList {
     render(this._movieListContainerComponent, this._noMovieComponent);
   }
 
+  _renderLoading() {
+    render(this._movieContainer, this._loadingComponent);
+  }
+
   _handleShowMoreButtonClick() {
 
     const movieCount = this._getMovies().length;
@@ -190,6 +212,7 @@ export default class MovieList {
     remove(this._sortComponent);
     remove(this._noMovieComponent);
     remove(this._showMoreButtonComponent);
+    remove(this._loadingComponent);
 
     if (resetRenderedMovieCount) {
       this._renderedMovieCount = CARD_COUNT_PER_STEP;
@@ -203,20 +226,24 @@ export default class MovieList {
   }
 
   _renderBoard() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
 
     const movies = this._getMovies();
     const movieCount = movies.length;
-
-    if (movieCount === 0) {
-      this._renderNoMovies();
-      return;
-    }
 
     this._renderSort();
 
     render(this._movieContainer, this._movieSectionComponent);
     render(this._movieSectionComponent, this._movieListComponent);
     render(this._movieListComponent, this._movieListContainerComponent);
+
+    if (movieCount === 0) {
+      this._renderNoMovies();
+      return;
+    }
 
     this._renderMovies(movies.slice(0, Math.min(movieCount, this._renderedMovieCount)));
 

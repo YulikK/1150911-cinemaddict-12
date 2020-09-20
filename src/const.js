@@ -34,7 +34,8 @@ export const UpdateType = {
   PATCH: `PATCH`,
   PATCH_CARD: `PATCH CARD`,
   MINOR: `MINOR`,
-  MAJOR: `MAJOR`
+  MAJOR: `MAJOR`,
+  INIT: `INIT`
 };
 
 export const FilterType = {

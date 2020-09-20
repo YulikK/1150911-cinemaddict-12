@@ -16,25 +16,25 @@ export default class Smart extends Abstract {
     if (!prevMovie.isFavorite === this._movie.isFavorite) {
 
       selectorUpdateElement = updateDetails ? `input[id=favorite]` : `.film-card__controls-item--favorite`;
-      restoreCallback = this._callback.favoriteClick;
+      restoreCallback = this._favoriteClickHandler;
       elementTemplate = this.getFavoriteTemplate();
 
     } else if (!prevMovie.isWatched === this._movie.isWatched) {
 
       selectorUpdateElement = updateDetails ? `input[id=watched]` : `.film-card__controls-item--mark-as-watched`;
-      restoreCallback = this._callback.watchedClick;
+      restoreCallback = this._watchedClickHandler;
       elementTemplate = this.getWatchedTemplate();
 
     } else if (!prevMovie.isWatchList === this._movie.isWatchList) {
 
       selectorUpdateElement = updateDetails ? `input[id=watchlist]` : `.film-card__controls-item--add-to-watchlist`;
-      restoreCallback = this._callback.addWatchListClick;
+      restoreCallback = this._addWatchListClickHandler;
       elementTemplate = this.getWatchListTemplate();
 
     } else if (prevMovie.comments !== this._movie.comments) {
 
       selectorUpdateElement = `.film-card__comments`;
-      restoreCallback = this._callback.movieClick;
+      restoreCallback = this._movieClickHandler;
       elementTemplate = this.getCommentsTemplate();
 
 
@@ -56,6 +56,7 @@ export default class Smart extends Abstract {
 
     this.updateElement();
   }
+
   updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate) {
 
     const element = this.getElement();
@@ -64,7 +65,7 @@ export default class Smart extends Abstract {
 
     replace(newElement, element.querySelector(selectorUpdateElement));
 
-    this.restoreHandlers(element, selectorUpdateElement, restoreCallback);
+    this.restoreHandlersMovieElement(element, selectorUpdateElement, restoreCallback);
 
   }
 
@@ -81,7 +82,7 @@ export default class Smart extends Abstract {
     this.restoreHandlers();
   }
 
-  restoreHandlers(element, selectorClass, restoreCallback) {
+  restoreHandlersMovieElement(element, selectorClass, restoreCallback) {
     element
         .querySelector(selectorClass)
         .addEventListener(`click`, restoreCallback);

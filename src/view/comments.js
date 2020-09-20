@@ -127,7 +127,7 @@ export default class Comments extends SmartView {
     const selectorUpdateElement = `.film-details__add-emoji-label`;
     const elementTemplate = createAddEmojiTemplate(newEmoji);
     const restoreCallback = this._callback.emojiClick;
-    this.updateElement(selectorUpdateElement, restoreCallback, elementTemplate);
+    this.updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate);
   }
 
   _setActiveEmojiItem(newEmoji, oldEmoji) {
@@ -135,14 +135,14 @@ export default class Comments extends SmartView {
     let elementTemplate = createEmotionTemplate(newEmoji, true);
     let restoreCallback = this._callback.emojiClick;
 
-    this.updateElement(selectorUpdateElement, restoreCallback, elementTemplate);
+    this.updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate);
 
     if (oldEmoji !== null) {
       selectorUpdateElement = `input[id=emoji-${oldEmoji}]`;
       elementTemplate = createEmotionTemplate(oldEmoji, false);
       restoreCallback = this._callback.emojiClick;
 
-      this.updateElement(selectorUpdateElement, restoreCallback, elementTemplate);
+      this.updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate);
     }
   }
 
