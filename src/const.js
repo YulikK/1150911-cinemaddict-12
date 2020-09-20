@@ -43,3 +43,18 @@ export const FilterType = {
   HISTORY: `history`,
   FAVORITES: `favorites`
 };
+
+export const MenuItem = {
+  MOVIES: `MOVIES`,
+  STATISTICS: `STATISTICS`
+};
+
+export const StatisticsType = {
+  ALL: `all-time`,
+  TODAY: `today`,
+  WEEK: `week`,
+  MONTH: `month`,
+  YEAR: `year`
+};
+
+export const BAR_HEIGHT = 50;

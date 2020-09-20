@@ -1,4 +1,4 @@
-import {getRandomInteger, getRandomFloat, generateId} from "../utils/common.js";
+import {getRandomInteger, getRandomFloat, generateId, makeItemsUnique} from "../utils/common.js";
 import {EMOTIONS, POSTERS_FOLDER} from "../const.js";
 
 
@@ -83,6 +83,21 @@ const generateDate = () => {
   return new Date(currentDate);
 };
 
+const generateWatchedDate = (isWatched) => {
+  if (!isWatched) {
+    return null;
+  }
+
+  const daysGap = getRandomInteger(-30, 0);
+  const currentDate = new Date();
+
+  currentDate.setHours(23, 59, 59, 999);
+
+  currentDate.setDate(currentDate.getDate() + daysGap);
+
+  return new Date(currentDate);
+};
+
 const generateComments = () => {
   const texts = [
     `Booo`,
@@ -123,7 +138,7 @@ const generateRating = () => {
 
 const generateDuration = () => {
 
-  return getRandomFloat(15, 150, 0);
+  return getRandomInteger(15, 150);
 
 };
 
@@ -145,7 +160,7 @@ const generateGenre = () => {
   for (let i = 0; i < randomCount; i++) {
     genre.push(genres[getRandomInteger(0, genres.length - 1)]);
   }
-  return genre;
+  return makeItemsUnique(genre);
 };
 
 const generateDirector = () => {
@@ -207,6 +222,7 @@ const generateActors = () => {
 };
 
 export const generateMovie = () => {
+  const isWatched = Boolean(getRandomInteger(0, 1));
   return {
     id: generateId(),
     title: generateTitle(),
@@ -224,7 +240,8 @@ export const generateMovie = () => {
     actors: generateActors(),
     country: generateCountry(),
     isWatchList: Boolean(getRandomInteger(0, 1)),
-    isWatched: Boolean(getRandomInteger(0, 1)),
+    isWatched,
+    watchingDate: generateWatchedDate(isWatched),
     isFavorite: Boolean(getRandomInteger(0, 1)),
   };
 };

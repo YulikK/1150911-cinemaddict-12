@@ -40,10 +40,23 @@ export default class Smart extends Abstract {
 
     }
 
-    this.updateElement(selectorUpdateElement, restoreCallback, elementTemplate);
+    this.updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate);
   }
 
-  updateElement(selectorUpdateElement, restoreCallback, elementTemplate) {
+  updateData(update) {
+    if (!update) {
+      return;
+    }
+
+    this._data = Object.assign(
+        {},
+        this._data,
+        update
+    );
+
+    this.updateElement();
+  }
+  updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate) {
 
     const element = this.getElement();
 
@@ -53,6 +66,19 @@ export default class Smart extends Abstract {
 
     this.restoreHandlers(element, selectorUpdateElement, restoreCallback);
 
+  }
+
+  updateElement() {
+    let prevElement = this.getElement();
+    const parent = prevElement.parentElement;
+    this.removeElement();
+
+    const newElement = this.getElement();
+
+    parent.replaceChild(newElement, prevElement);
+    prevElement = null;
+
+    this.restoreHandlers();
   }
 
   restoreHandlers(element, selectorClass, restoreCallback) {
