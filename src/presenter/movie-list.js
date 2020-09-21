@@ -90,7 +90,13 @@ export default class MovieList {
           })
           .then((movieUpdate) => {
             this._moviesModel.updateMovie(updateType, movieUpdate);
-          }));
+          }))
+          .catch(() => {
+            this._moviePresenter[update.id].setAborting();
+          });
+        break;
+      case UserAction.UPDATE_LOCAL:
+        this._moviesModel.updateMovie(updateType, update);
         break;
     }
   }
@@ -156,7 +162,8 @@ export default class MovieList {
         this._movieDetailsContainer,
         this._handleViewAction,
         this._handleModeChange,
-        this._filterModel.getFilter()
+        this._filterModel.getFilter(),
+        this._api
     );
 
     moviePresenter.init(movie);

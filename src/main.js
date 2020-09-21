@@ -1,5 +1,4 @@
 import ProfileView from "./view/profile.js";
-// import StatsView from "./view/stats.js";
 import StatisticsView from "./view/statistics.js";
 import FooterStatisticView from "./view/footer-statistic.js";
 import MoviesModel from "./model/movies.js";

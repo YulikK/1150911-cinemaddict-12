@@ -1,9 +1,9 @@
 import AbstractView from "./abstract.js";
 
 const createLoadingTemplate = () => {
-  return `<p class="board__no-tasks">
+  return `<h2 class="films-list__title">
     Loading...
-  </p>`;
+  </h2>`;
 };
 
 export default class Loading extends AbstractView {

@@ -15,10 +15,7 @@ export default class Comments extends Observer {
   }
 
   addComment(updateType, update) {
-    this._comments = [
-      update,
-      ...this._comments
-    ];
+    this._comments = update.slice();
 
     this._notify(updateType, update);
   }
@@ -59,7 +56,7 @@ export default class Comments extends Observer {
         {},
         comment,
         {
-          "author": comment.autor,
+          "emotion": comment.emotion,
           "comment": comment.text,
           "date": comment.date.toISOString()
         }

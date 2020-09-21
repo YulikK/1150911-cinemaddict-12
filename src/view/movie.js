@@ -85,6 +85,14 @@ export default class Movie extends SmartView {
     return createCommentsTemplate(this._movie.comments);
   }
 
+  setState(isDisabled = false) {
+    if (isDisabled) {
+      this.getElement().setAttribute(`disabled`, `disabled`);
+    } else {
+      this.getElement().removeAttribute(`disabled`);
+    }
+  }
+
   _movieClickHandler(evt) {
     evt.preventDefault();
     this._callback.movieClick();

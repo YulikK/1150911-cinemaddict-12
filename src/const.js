@@ -26,6 +26,7 @@ export const POSTERS_FOLDER = `./images/posters/`;
 
 export const UserAction = {
   UPDATE: `UPDATE`,
+  UPDATE_LOCAL: `UPDATE_LOCAL`,
   ADD: `ADD`,
   DELETE: `DELETE`
 };
