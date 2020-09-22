@@ -169,10 +169,6 @@ export default class Statistic extends SmartView {
       filterType: evt.target.value
     });
 
-    // this._data.filterType = evt.target.value;
-    // this._setActiveFilterElement(this._data.filterType, prevFilterType);
-
-    // this._setCharts();
   }
 
   _setActiveFilterElement(newFilterType, oldFilterType) {

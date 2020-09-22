@@ -3,8 +3,15 @@ import {formatMovieDate} from "../utils/movie.js";
 import SmartView from "./smart.js";
 import {EMOTIONS} from "../const.js";
 
+const deleteCommentTemplate = (id, isDisabled = false) => {
+  return (
+    `<button class="film-details__comment-delete" value="${id}"${isDisabled ? `disabled` : ``}>${isDisabled ? `Deleting...` : `Delete`}</button>`
+  );
+};
+
 const createCommentTemplate = (comment) => {
   const {id, text, emotion, autor, date} = comment;
+  const deleteTemplate = deleteCommentTemplate(id);
   return (
     `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
@@ -15,7 +22,7 @@ const createCommentTemplate = (comment) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${autor}</span>
           <span class="film-details__comment-day">${formatMovieDate(date, `YYYY/MM/DD HH:MM`)}</span>
-          <button class="film-details__comment-delete" value="${id}">Delete</button>
+          ${deleteTemplate}
         </p>
       </div>
     </li>`
@@ -106,9 +113,19 @@ export default class Comments extends SmartView {
     return this._currentEmoji;
   }
 
+  setDeletingState(comment, isDisabled) {
+    let selectorUpdateElement = `button[value="${comment.id}"]`;
+    let elementTemplate = deleteCommentTemplate(comment.id, isDisabled);
+    let restoreCallback = this._deleteClickHandler;
+
+    this.updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate);
+  }
+
   _deleteClickHandler(evt) {
     evt.preventDefault();
-    this._callback.deleteClick(this._getElementById(Number(evt.target.value)));
+    const commentId = this._getElementById(evt.target.value);
+    this.setDeletingState(commentId, true);
+    this._callback.deleteClick(commentId);
   }
 
   _emojiClickHandler(evt) {
@@ -126,23 +143,23 @@ export default class Comments extends SmartView {
   _setNewEmoji(newEmoji) {
     const selectorUpdateElement = `.film-details__add-emoji-label`;
     const elementTemplate = createAddEmojiTemplate(newEmoji);
-    const restoreCallback = this._callback.emojiClick;
-    this.updateElement(selectorUpdateElement, restoreCallback, elementTemplate);
+    const restoreCallback = this._emojiClickHandler;
+    this.updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate);
   }
 
   _setActiveEmojiItem(newEmoji, oldEmoji) {
     let selectorUpdateElement = `input[id=emoji-${newEmoji}]`;
     let elementTemplate = createEmotionTemplate(newEmoji, true);
-    let restoreCallback = this._callback.emojiClick;
+    let restoreCallback = this._emojiClickHandler;
 
-    this.updateElement(selectorUpdateElement, restoreCallback, elementTemplate);
+    this.updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate);
 
     if (oldEmoji !== null) {
       selectorUpdateElement = `input[id=emoji-${oldEmoji}]`;
       elementTemplate = createEmotionTemplate(oldEmoji, false);
-      restoreCallback = this._callback.emojiClick;
+      restoreCallback = this._emojiClickHandler;
 
-      this.updateElement(selectorUpdateElement, restoreCallback, elementTemplate);
+      this.updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate);
     }
   }
 
@@ -156,7 +173,6 @@ export default class Comments extends SmartView {
   }
 
   _getElementById(id) {
-
     const index = this._comments.findIndex((comment) => comment.id === id);
     const commentElement = this._comments[index];
     return commentElement;

@@ -123,10 +123,21 @@ export default class MovieDetails extends SmartView {
     super();
     this._movie = movie;
 
+    this.setState();
+
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._watchedClickHandler = this._watchedClickHandler.bind(this);
     this._addWatchListClickHandler = this._addWatchListClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+  }
+
+  setState(isDisabled = false) {
+    const formElement = this.getElement().querySelector(`.film-details__inner`);
+    if (isDisabled) {
+      formElement.setAttribute(`disabled`, `disabled`);
+    } else {
+      formElement.removeAttribute(`disabled`);
+    }
   }
 
   getTemplate() {

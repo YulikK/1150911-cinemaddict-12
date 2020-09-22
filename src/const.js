@@ -26,6 +26,7 @@ export const POSTERS_FOLDER = `./images/posters/`;
 
 export const UserAction = {
   UPDATE: `UPDATE`,
+  UPDATE_LOCAL: `UPDATE_LOCAL`,
   ADD: `ADD`,
   DELETE: `DELETE`
 };
@@ -34,7 +35,8 @@ export const UpdateType = {
   PATCH: `PATCH`,
   PATCH_CARD: `PATCH CARD`,
   MINOR: `MINOR`,
-  MAJOR: `MAJOR`
+  MAJOR: `MAJOR`,
+  INIT: `INIT`
 };
 
 export const FilterType = {

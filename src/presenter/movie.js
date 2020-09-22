@@ -2,9 +2,7 @@ import MovieView from "../view/movie.js";
 import MovieDetailsView from "../view/movie-details.js";
 import CommentsView from "../view/comments.js";
 import CommentsModel from "../model/comments.js";
-import {generateId} from "../utils/common.js";
 import {render, hideDetails, showDetails, remove} from "../utils/render.js";
-import {getRandomName} from "../utils/movie.js";
 import {Mode, UserAction, UpdateType, FilterType} from "../const.js";
 
 export default class Movie {
@@ -13,13 +11,15 @@ export default class Movie {
       movieDetailsContainer,
       changeData,
       changeMode,
-      changeFilter
+      changeFilter,
+      api
   ) {
     this._movieContainer = movieContainer;
     this._movieDetailsContainer = movieDetailsContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
     this._changeFilter = changeFilter;
+    this._api = api;
 
     this._movieComponent = null;
     this._movieDetailsComponent = null;
@@ -84,35 +84,66 @@ export default class Movie {
     }
   }
 
+  setAborting() {
+    const resetFormState = () => {
+      this._movieDetailsComponent.setState();
+      this._movieComponent.setState();
+    };
+
+    this._movieDetailsComponent.shake(resetFormState);
+    this._movieComponent.shake(resetFormState);
+  }
+
   _handleViewAction(actionType, updateType, update) {
+    const resetFormState = () => {
+      this._movieDetailsComponent.setState();
+    };
+
+    const resetButtonState = () => {
+      this._commentsComponent.setDeletingState(update, false);
+    };
+
     switch (actionType) {
       case UserAction.ADD:
-        this._commentsModel.addComment(updateType, update);
-        this._changeData(
-            UserAction.UPDATE,
-            UpdateType.PATCH_CARD,
-            Object.assign(
-                {},
-                this._movie,
-                {
-                  comments: this._commentsModel.getComments()
-                }
-            )
-        );
+        this._api.addComment(this._movie, update)
+        .then((response) => {
+          this._commentsModel.addComment(updateType, response);
+          this._changeData(
+              UserAction.UPDATE_LOCAL,
+              UpdateType.PATCH_CARD,
+              Object.assign(
+                  {},
+                  this._movie,
+                  {
+                    comments: this._commentsModel.getComments()
+                  }
+              )
+          );
+          this._movieDetailsComponent.setState();
+        })
+        .catch(() => {
+          this._movieDetailsComponent.shake(resetFormState);
+        });
         break;
       case UserAction.DELETE:
-        this._commentsModel.deleteComment(updateType, update);
-        this._changeData(
-            UserAction.UPDATE,
-            UpdateType.PATCH_CARD,
-            Object.assign(
-                {},
-                this._movie,
-                {
-                  comments: this._commentsModel.getComments()
-                }
-            )
-        );
+        this._api.deleteComment(update)
+        .then(() => {
+          this._commentsModel.deleteComment(updateType, update);
+          this._changeData(
+              UserAction.UPDATE,
+              UpdateType.PATCH_CARD,
+              Object.assign(
+                  {},
+                  this._movie,
+                  {
+                    comments: this._commentsModel.getComments()
+                  }
+              )
+          );
+        })
+        .catch(() => {
+          this._commentsComponent.shake(resetButtonState);
+        });
         break;
     }
   }
@@ -164,8 +195,7 @@ export default class Movie {
     this._commentsComponent.setDeleteClickHandler(this._handleDeleteClick);
     this._commentsComponent.setEmojiClickHandler(this._handleEmojiChange);
 
-    render(this._movieDetailsComponent, this._commentsComponent);
-
+    render(this._movieDetailsComponent.getElement().querySelector(`.film-details__inner`), this._commentsComponent);
   }
 
   _clearComments() {
@@ -257,10 +287,9 @@ export default class Movie {
   _enterKeyDownHandler(evt) {
 
     if ((evt.ctrlKey) && ((evt.keyCode === 0xA) || (evt.keyCode === 0xD))) {
+      this._movieDetailsComponent.setState(true);
       evt.preventDefault();
       const update = {
-        id: generateId(),
-        autor: getRandomName(),
         text: this._commentsComponent.getNewComment(),
         emotion: this._commentsComponent.getNewEmoji(),
         date: new Date(),
