@@ -90,7 +90,6 @@ apiWithProvider.getMovies()
   })
 
   .catch(() => {
-
     moviesModel.setMovies(UpdateType.INIT, []);
     filterPresenter.init();
     filterPresenter.setClickHandler(handleSiteMenuClick);

@@ -4,12 +4,13 @@ import SortView from "../view/sort.js";
 import MovieSectionView from "../view/movies.js";
 import MovieListView from "../view/movie-list.js";
 import NoMovieView from "../view/no-movie.js";
+import TopListView from "../view/movies-top.js";
 import MovieListContainerView from "../view/movie-container.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
 import LoadingView from "../view/loading.js";
 import {render, remove} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
-import {sortByDate, sortByRating} from "../utils/movie.js";
+import {sortByDate, sortByRating, getTopRatedMovies} from "../utils/movie.js";
 import {SortType, UpdateType, UserAction} from "../const.js";
 
 export default class MovieList {
@@ -29,11 +30,15 @@ export default class MovieList {
 
     this._sortComponent = null;
     this._showMoreButtonComponent = null;
+    this._topRatedComponent = null;
+    this._mostRecommentedComponent = null;
+    this._topRatedContainer = null;
 
     this._renderedMovieCount = CARD_COUNT_PER_STEP;
     this._currentSortType = SortType.DEFAULT;
 
     this._moviePresenter = {};
+    this._movieTopPresenter = {};
     this._isLoading = true;
 
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -78,7 +83,7 @@ export default class MovieList {
     return filtredMovies;
   }
 
-  _handleViewAction(actionType, updateType, update) {
+  _handleViewAction(actionType, updateType, update, container) {
     switch (actionType) {
       case UserAction.UPDATE:
         this._api.updateMovie(update)
@@ -88,7 +93,11 @@ export default class MovieList {
             this._moviesModel.updateMovie(updateType, movieUpdate);
           }))
           .catch(() => {
-            this._moviePresenter[update.id].setAborting();
+            if (container === this._topRatedContainer) {
+              this._movieTopPresenter[update.id].setAborting();
+            } else {
+              this._moviePresenter[update.id].setAborting();
+            }
           });
         break;
       case UserAction.UPDATE_LOCAL:
@@ -100,10 +109,22 @@ export default class MovieList {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._moviePresenter[data.id].update(data);
+        if (this._moviePresenter[data.id] !== undefined) {
+          this._moviePresenter[data.id].update(data);
+        }
+
+        if (this._movieTopPresenter[data.id] !== undefined) {
+          this._movieTopPresenter[data.id].update(data);
+        }
         break;
       case UpdateType.PATCH_CARD:
-        this._moviePresenter[data.id].updateCard(data);
+        if (this._moviePresenter[data.id] !== undefined) {
+          this._moviePresenter[data.id].updateCard(data);
+        }
+
+        if (this._movieTopPresenter[data.id] !== undefined) {
+          this._movieTopPresenter[data.id].updateCard(data);
+        }
         break;
       case UpdateType.MINOR:
         this._clearBoard();
@@ -152,9 +173,10 @@ export default class MovieList {
 
   }
 
-  _renderMovie(movie) {
+  _renderMovie(movie, container, presenter) {
+
     const moviePresenter = new MoviePresenter(
-        this._movieListContainerComponent,
+        container, // this._movieListContainerComponent,
         this._movieDetailsContainer,
         this._handleViewAction,
         this._handleModeChange,
@@ -163,11 +185,12 @@ export default class MovieList {
     );
 
     moviePresenter.init(movie);
-    this._moviePresenter[movie.id] = moviePresenter;
+    presenter[movie.id] = moviePresenter;
+
   }
 
-  _renderMovies(movies) {
-    movies.forEach((movie) => this._renderMovie(movie));
+  _renderMovies(movies, container, presenter) {
+    movies.forEach((movie) => this._renderMovie(movie, container, presenter));
   }
 
   _renderNoMovies() {
@@ -184,7 +207,7 @@ export default class MovieList {
     const newRenderedMovieCount = Math.min(movieCount, this._renderedMovieCount + CARD_COUNT_PER_STEP);
     const movies = this._getMovies().slice(this._renderedMovieCount, newRenderedMovieCount);
 
-    this._renderMovies(movies);
+    this._renderMovies(movies, this._movieListContainerComponent, this._moviePresenter);
     this._renderedMovieCount = newRenderedMovieCount;
 
     if (this._renderedMovieCount >= movieCount) {
@@ -211,11 +234,13 @@ export default class MovieList {
       .values(this._moviePresenter)
       .forEach((presenter) => presenter.destroy());
     this._moviePresenter = {};
+    this._movieTopPresenter = {};
 
     remove(this._sortComponent);
     remove(this._noMovieComponent);
     remove(this._showMoreButtonComponent);
     remove(this._loadingComponent);
+    remove(this._topRatedComponent);
 
     if (resetRenderedMovieCount) {
       this._renderedMovieCount = CARD_COUNT_PER_STEP;
@@ -248,11 +273,33 @@ export default class MovieList {
       return;
     }
 
-    this._renderMovies(movies.slice(0, Math.min(movieCount, this._renderedMovieCount)));
+    this._renderMovies(movies.slice(0, Math.min(movieCount, this._renderedMovieCount)), this._movieListContainerComponent, this._moviePresenter);
 
     if (movieCount > this._renderedMovieCount) {
       this._renderShowMoreButton();
     }
 
+    const topRatedMovies = getTopRatedMovies(this._moviesModel.getMovies());
+
+    if (topRatedMovies.length !== 0) {
+
+      this._renderExtraList(topRatedMovies);
+    }
+
   }
+
+  _renderExtraList(topRatedMovies) {
+
+    if (this._topRatedComponent !== null) {
+      this._topRatedComponent = null;
+    }
+
+    this._topRatedComponent = new TopListView();
+    render(this._movieSectionComponent, this._topRatedComponent);
+    this._topRatedContainer = this._topRatedComponent.getContainer();
+
+    this._renderMovies(topRatedMovies, this._topRatedContainer, this._movieTopPresenter);
+
+  }
+
 }

@@ -1,5 +1,5 @@
 import he from "he";
-import {formatMovieDate} from "../utils/movie.js";
+import {formatCommentDate} from "../utils/movie.js";
 import SmartView from "./smart.js";
 import {EMOTIONS} from "../const.js";
 
@@ -21,7 +21,7 @@ const createCommentTemplate = (comment) => {
         <p class="film-details__comment-text">${he.encode(text)}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${autor}</span>
-          <span class="film-details__comment-day">${formatMovieDate(date, `YYYY/MM/DD HH:MM`)}</span>
+          <span class="film-details__comment-day">${formatCommentDate(date)}</span>
           ${deleteTemplate}
         </p>
       </div>

@@ -48,6 +48,22 @@ export default class Provider {
     return Promise.resolve(movie);
   }
 
+  addComment(movie, comment) {
+    if (Provider.isOnline()) {
+      return this._api.addComment(movie, comment);
+    }
+
+    return Promise.resolve(movie);
+  }
+
+  deleteComment(comment) {
+    if (Provider.isOnline()) {
+      return this._api.deleteComment(comment);
+    }
+    return null;
+  }
+
+
   getComments(movie) {
     if (Provider.isOnline()) {
       return this._api.getComments(movie)

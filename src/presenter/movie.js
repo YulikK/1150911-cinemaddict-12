@@ -39,7 +39,6 @@ export default class Movie {
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
-
   }
 
   init(movie) {
@@ -60,6 +59,10 @@ export default class Movie {
     render(this._movieContainer, this._movieComponent);
 
   }
+
+  // renderCard(container) {
+  //   render(container, this._movieComponent);
+  // }
 
   _initPopup() {
     this._movieDetailsComponent = new MovieDetailsView(this._movie, this._commentsModel.getComments());
@@ -82,6 +85,10 @@ export default class Movie {
     if (this._mode !== Mode.DEFAULT) {
       this._hideMovieDetails();
     }
+  }
+
+  getCard() {
+    return this._movieComponent.getElement();
   }
 
   setAborting() {
@@ -117,7 +124,8 @@ export default class Movie {
                   {
                     comments: this._commentsModel.getComments()
                   }
-              )
+              ),
+              this._movieContainer
           );
           this._movieDetailsComponent.setState();
         })
@@ -138,7 +146,8 @@ export default class Movie {
                   {
                     comments: this._commentsModel.getComments()
                   }
-              )
+              ),
+              this._movieContainer
           );
         })
         .catch(() => {
@@ -216,7 +225,8 @@ export default class Movie {
       this._changeData(
           UserAction.UPDATE,
           UpdateType.MINOR,
-          this._movie
+          this._movie,
+          this._movieContainer
       );
     }
     this._initPopup();
@@ -232,7 +242,8 @@ export default class Movie {
             {
               isFavorite: !this._movie.isFavorite
             }
-        )
+        ),
+        this._movieContainer
     );
   }
 
@@ -247,7 +258,8 @@ export default class Movie {
               isWatched: !this._movie.isWatched,
               watchingDate: this._movie.isWatched ? null : new Date()
             }
-        )
+        ),
+        this._movieContainer
     );
   }
 
@@ -261,7 +273,8 @@ export default class Movie {
             {
               isWatchList: !this._movie.isWatchList
             }
-        )
+        ),
+        this._movieContainer
     );
   }
 

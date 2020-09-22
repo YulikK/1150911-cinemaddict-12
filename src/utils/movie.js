@@ -1,5 +1,5 @@
 import moment from "moment";
-import {getRandomInteger} from "../utils/common.js";
+import {getRandomInteger, makeItemsUnique} from "../utils/common.js";
 
 export const formatMovieDuration = (duration) => {
   const hours = moment.duration(duration, `minutes`).hours();
@@ -12,6 +12,13 @@ export const formatMovieDate = (date, format) => {
     return ``;
   }
   return moment(date).format(format);
+};
+
+export const formatCommentDate = (date) => {
+  if (!(date instanceof Date)) {
+    return ``;
+  }
+  return moment(date).fromNow(moment());
 };
 
 const getWeightForNullDate = (dateA, dateB) => {
@@ -51,6 +58,16 @@ export const sortByRating = (movieA, movieB) => {
   return movieB.rating - movieA.rating;
 };
 
+export const sortByMovieRating = (ratingA, ratingB) => {
+  const weight = getWeightForNullDate(ratingA, ratingB);
+
+  if (weight !== null) {
+    return weight;
+  }
+
+  return ratingB - ratingA;
+};
+
 export const getRandomName = () => {
   const autors = [
     `Igor`,
@@ -58,4 +75,33 @@ export const getRandomName = () => {
     `Anna`
   ];
   return autors[getRandomInteger(0, autors.length - 1)];
+};
+
+export const getTopRatedMovies = (movies) => {
+
+  const topRatedMovies = [];
+  let moviesLast = movies.map((item) => item);
+
+  const movieRating = [].concat(...movies.map((movie) => movie.rating));
+  const uniqueRating = makeItemsUnique(movieRating);
+  uniqueRating.sort(sortByMovieRating);
+
+  uniqueRating.forEach((rating) => {
+
+    if (rating > 0) {
+      const sameRateMovie = moviesLast.filter((movie) => movie.rating === rating);
+
+      for (let i = 0; i <= sameRateMovie.length; i++) {
+        let indexRandomMovie = Math.floor(Math.random() * sameRateMovie.length);
+        if (topRatedMovies.length < 2) {
+          topRatedMovies.push(sameRateMovie[indexRandomMovie]);
+        }
+        sameRateMovie.splice(indexRandomMovie, 1);
+      }
+
+    }
+  });
+
+  return topRatedMovies;
+
 };
