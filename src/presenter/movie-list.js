@@ -84,10 +84,6 @@ export default class MovieList {
         this._api.updateMovie(update)
         .then((movie) =>
           this._api.getComments(movie)
-          .then((comments) => {
-            movie.comments = comments;
-            return movie;
-          })
           .then((movieUpdate) => {
             this._moviesModel.updateMovie(updateType, movieUpdate);
           }))

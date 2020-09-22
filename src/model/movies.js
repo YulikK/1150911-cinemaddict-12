@@ -118,7 +118,13 @@ export default class Movies extends Observer {
   }
 
   static _adaptComments(comments) {
-    return comments.map((comment) => comment.id);
+    return comments.map((comment) => {
+      if (comment instanceof Object) {
+        return comment.id;
+      } else {
+        return comment;
+      }
+    });
   }
 
 

@@ -38,7 +38,7 @@ export const sortByDate = (movieA, movieB) => {
     return weight;
   }
 
-  return movieA.date.getTime() - movieB.date.getTime();
+  return movieB.date.getTime() - movieA.date.getTime();
 };
 
 export const sortByRating = (movieA, movieB) => {

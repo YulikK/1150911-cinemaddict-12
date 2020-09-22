@@ -9,13 +9,21 @@ import {filter} from "./utils/filter.js";
 import {FilterType, MenuItem, UpdateType} from "./const.js";
 import MovieListPresenter from "./presenter/movie-list.js";
 import FilterPresenter from "./presenter/filter.js";
-import Api from "./api.js";
+import Api from "./api/index.js";
+import Store from "./api/store.js";
+import Provider from "./api/provider.js";
 
 const AUTHORIZATION = `Basic i83jha8f73jhtn3po`;
 const END_POINT = `https://12.ecmascript.pages.academy/cinemaddict`;
+const STORE_PREFIX = `cinemaddict`;
+const STORE_VER = `v1`;
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+
 let menuItem = null;
 
 const api = new Api(END_POINT, AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
 const allMovies = generateCountMovies();
 
@@ -30,7 +38,7 @@ const siteFooterElement = siteBodyElement.querySelector(`.footer`);
 render(siteHeaderElement, new ProfileView(filter[FilterType.HISTORY](moviesModel.getMovies()).length));
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, moviesModel);
 
-const movieListPresenter = new MovieListPresenter(siteMainElement, siteBodyElement, moviesModel, filterModel, api);
+const movieListPresenter = new MovieListPresenter(siteMainElement, siteBodyElement, moviesModel, filterModel, apiWithProvider);
 
 const siteStatisticsElement = siteFooterElement.querySelector(`.footer__statistics`);
 render(siteStatisticsElement, new FooterStatisticView(allMovies));
@@ -61,7 +69,7 @@ const handleSiteMenuClick = (newMenuItem) => {
 
 movieListPresenter.init();
 
-api.getMovies()
+apiWithProvider.getMovies()
 .then((movies) => {
 
   const promisComment = movies.map((movie) => api.getComments(movie));
@@ -90,3 +98,20 @@ api.getMovies()
   });
 });
 
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`)
+    .then(() => {
+      console.log(`ServiceWorker available`); // eslint-disable-line
+    }).catch(() => {
+      console.error(`ServiceWorker isn't available`); // eslint-disable-line
+    });
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(`[offline] `, ``);
+  apiWithProvider.sync();
+});
+
+window.addEventListener(`offline`, () => {
+  document.title = `[offline] ` + document.title;
+});
