@@ -132,10 +132,11 @@ export default class MovieDetails extends SmartView {
   }
 
   setState(isDisabled = false) {
+    const formElement = this.getElement().querySelector(`.film-details__inner`);
     if (isDisabled) {
-      this.getElement().querySelector(`.film-details__inner`).setAttribute(`disabled`, `disabled`);
+      formElement.setAttribute(`disabled`, `disabled`);
     } else {
-      this.getElement().querySelector(`.film-details__inner`).removeAttribute(`disabled`);
+      formElement.removeAttribute(`disabled`);
     }
   }
 

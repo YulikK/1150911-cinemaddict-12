@@ -5,11 +5,6 @@ import CommentsModel from "../model/comments.js";
 import {render, hideDetails, showDetails, remove} from "../utils/render.js";
 import {Mode, UserAction, UpdateType, FilterType} from "../const.js";
 
-export const State = {
-  SAVE: `SAVE`,
-  DELETE: `DELETE`
-};
-
 export default class Movie {
   constructor(
       movieContainer,
