@@ -5,13 +5,13 @@ import MovieSectionView from "../view/movies.js";
 import MovieListView from "../view/movie-list.js";
 import NoMovieView from "../view/no-movie.js";
 import TopListView from "../view/movies-top.js";
-import RecoomentedListView from "../view/movies-recommend.js";
+import RecommendedListView from "../view/movies-recommend.js";
 import MovieListContainerView from "../view/movie-container.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
 import LoadingView from "../view/loading.js";
 import {render, remove} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
-import {sortByDate, sortByRating, getTopRatedMovies, getMostRecommentedMovies} from "../utils/movie.js";
+import {sortByDate, sortByRating, getTopRatedMovies, getMostRecommendedMovies} from "../utils/movie.js";
 import {SortType, UpdateType, UserAction} from "../const.js";
 
 export default class MovieList {
@@ -32,9 +32,9 @@ export default class MovieList {
     this._sortComponent = null;
     this._showMoreButtonComponent = null;
     this._topRatedComponent = null;
-    this._recommentedComponent = null;
+    this._recommendedComponent = null;
     this._topRatedContainer = null;
-    this._recommentedContainer = null;
+    this._recommendedContainer = null;
 
     this._renderedMovieCount = CARD_COUNT_PER_STEP;
     this._currentSortType = SortType.DEFAULT;
@@ -132,15 +132,14 @@ export default class MovieList {
               this._initRecommentedSection();
             }
           }))
-          .catch((err) => {
-            console.log(err); // eslint-disable-line
+          .catch(() => {
             switch (container) {
               case this._topRatedContainer:
                 if (this._movieTopPresenter[update.id] instanceof Object) {
                   this._movieTopPresenter[update.id].setAborting();
                 }
                 break;
-              case this._recommentedContainer:
+              case this._recommendedContainer:
                 if (this._movieRecommentedPresenter[update.id] instanceof Object) {
                   this._movieRecommentedPresenter[update.id].setAborting();
                 }
@@ -326,7 +325,7 @@ export default class MovieList {
     remove(this._showMoreButtonComponent);
     remove(this._loadingComponent);
     remove(this._topRatedComponent);
-    remove(this._recommentedComponent);
+    remove(this._recommendedComponent);
 
     if (resetRenderedMovieCount) {
       this._renderedMovieCount = CARD_COUNT_PER_STEP;
@@ -390,13 +389,13 @@ export default class MovieList {
 
   _initRecommentedSection() {
 
-    if (this._recommentedComponent !== null) {
-      remove(this._recommentedComponent);
+    if (this._recommendedComponent !== null) {
+      remove(this._recommendedComponent);
       this._movieRecommentedPresenter = {};
-      this._recommentedComponent = null;
+      this._recommendedComponent = null;
     }
 
-    const mostRecommentedMovies = getMostRecommentedMovies(this._moviesModel.getMovies());
+    const mostRecommentedMovies = getMostRecommendedMovies(this._moviesModel.getMovies());
 
     if (mostRecommentedMovies.length !== 0) {
 
@@ -417,11 +416,11 @@ export default class MovieList {
 
   _renderRecommentedList(mostRecommentedMovies) {
 
-    this._recommentedComponent = new RecoomentedListView();
-    render(this._movieSectionComponent, this._recommentedComponent);
-    this._recommentedContainer = this._recommentedComponent.getContainer();
+    this._recommendedComponent = new RecommendedListView();
+    render(this._movieSectionComponent, this._recommendedComponent);
+    this._recommendedContainer = this._recommendedComponent.getContainer();
 
-    this._renderMovies(mostRecommentedMovies, this._recommentedContainer, this._movieRecommentedPresenter);
+    this._renderMovies(mostRecommentedMovies, this._recommendedContainer, this._movieRecommentedPresenter);
 
   }
 

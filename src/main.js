@@ -80,16 +80,15 @@ apiWithProvider.getMovies()
   })
 
   .then((moviesArray) => {
-    moviesModel.setMovies(UpdateType.INIT, UpdateType.NOT, moviesArray);
+    moviesModel.setMovies(UpdateType.INIT, null, moviesArray);
     filterPresenter.init();
     filterPresenter.setClickHandler(handleSiteMenuClick);
     render(siteStatisticsElement, new FooterStatisticView(moviesArray.length));
 
   })
 
-  .catch((error) => {
-    console.log(error); // eslint-disable-line
-    moviesModel.setMovies(UpdateType.INIT, UpdateType.NOT, []);
+  .catch(() => {
+    moviesModel.setMovies(UpdateType.INIT, null, []);
     filterPresenter.init();
     filterPresenter.setClickHandler(handleSiteMenuClick);
 

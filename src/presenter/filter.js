@@ -61,7 +61,7 @@ export default class Filter {
     if (this._currentFilter === filterType || filterType === undefined) {
       return;
     }
-    this._filterModel.setFilter(UpdateType.MAJOR, UpdateType.NOT, filterType);
+    this._filterModel.setFilter(UpdateType.MAJOR, null, filterType);
   }
 
   _getFilters() {
@@ -88,7 +88,7 @@ export default class Filter {
         this._statsComponent.removeActiveMenuElement();
         break;
       case MenuItem.STATISTICS:
-        this._filterModel.setFilter(UpdateType.MAJOR, UpdateType.NOT, null);
+        this._filterModel.setFilter(UpdateType.MAJOR, null, null);
         this._statsComponent.setActiveMenuElement();
         break;
     }

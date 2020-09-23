@@ -21,7 +21,7 @@ export default class Movie {
     this._changeMode = changeMode;
     this._changeFilter = changeFilter;
     this._api = api;
-    this._needUpdateBoard = false;
+    this._needMovieList = false;
 
     this._movieComponent = null;
     this._movieDetailsComponent = null;
@@ -139,8 +139,7 @@ export default class Movie {
           );
           this._movieDetailsComponent.setState();
         })
-        .catch((err) => {
-          console.log(err); // eslint-disable-line
+        .catch(() => {
           this._movieDetailsComponent.shake(resetFormState);
         });
         break;
@@ -163,8 +162,7 @@ export default class Movie {
               true
           );
         })
-        .catch((err) => {
-          console.log(err); // eslint-disable-line
+        .catch(() => {
           this._commentsComponent.shake(resetButtonState);
         });
         break;
@@ -230,15 +228,15 @@ export default class Movie {
     document.removeEventListener(`keydown`, this._enterKeyDownHandler);
     this._mode = Mode.DEFAULT;
 
-    if (this._needUpdateBoard) {
+    if (this._needMovieList) {
       this._changeData(
           UserAction.UPDATE,
           UpdateType.MINOR,
-          UpdateType.NOT,
+          null,
           this._movie,
           this._movieContainer
       );
-      this._needUpdateBoard = false;
+      this._needMovieList = false;
     }
     this._initPopup();
   }
@@ -257,7 +255,7 @@ export default class Movie {
         ),
         this._movieContainer
     );
-    this._needUpdateBoard = this._changeFilter === FilterType.FAVORITES && this._mode === Mode.DETAILS;
+    this._needMovieList = this._changeFilter === FilterType.FAVORITES && this._mode === Mode.DETAILS;
   }
 
   _handleWatchedClick() {
@@ -275,7 +273,7 @@ export default class Movie {
         ),
         this._movieContainer
     );
-    this._needUpdateBoard = this._changeFilter === FilterType.HISTORY && this._mode === Mode.DETAILS;
+    this._needMovieList = this._changeFilter === FilterType.HISTORY && this._mode === Mode.DETAILS;
   }
 
   _handleAddWatchListClick() {
@@ -292,7 +290,7 @@ export default class Movie {
         ),
         this._movieContainer
     );
-    this._needUpdateBoard = this._changeFilter === FilterType.WATCHLIST && this._mode === Mode.DETAILS;
+    this._needMovieList = this._changeFilter === FilterType.WATCHLIST && this._mode === Mode.DETAILS;
   }
 
   _handleMovieClick() {

@@ -97,7 +97,7 @@ export const getTopRatedMovies = (movies) => {
 
 };
 
-export const getMostRecommentedMovies = (movies) => {
+export const getMostRecommendedMovies = (movies) => {
 
   const mostRecommentedMovies = [];
   let moviesLast = movies.map((item) => item);
