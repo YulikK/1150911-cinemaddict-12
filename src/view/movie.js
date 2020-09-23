@@ -1,5 +1,5 @@
 import SmartView from "./smart.js";
-import {formatMovieDuration, formatMovieDate} from "../utils/movie.js";
+import {formatMovieDuration, formatMovieDate, formatMovieDescription} from "../utils/movie.js";
 
 const markTemplate = ` film-card__controls-item--active`;
 
@@ -29,7 +29,6 @@ const createCommentsTemplate = (comments) => {
 
 const createMovieTemplate = (movie) => {
   const {title, poster, description, comments, rating, date, duration, genres, isWatchList, isWatched, isFavorite} = movie;
-
   const watchedTemplate = createWatchedTemplate(isWatched);
   const watchListTemplate = createWatchListTemplate(isWatchList);
   const favoriteTemplate = createFavoriteTemplate(isFavorite);
@@ -41,10 +40,10 @@ const createMovieTemplate = (movie) => {
         <p class="film-card__info">
           <span class="film-card__year">${formatMovieDate(date, `YYYY`)}</span>
           <span class="film-card__duration">${formatMovieDuration(duration)}</span>
-          <span class="film-card__genre">${genres[0]}</span>
+          <span class="film-card__genre">${genres.length > 0 ? genres[0] : ``}</span>
         </p>
         <img src="${poster}" alt="" class="film-card__poster">
-        <p class="film-card__description">${description}</p>
+        <p class="film-card__description">${formatMovieDescription(description)}</p>
         ${commentsTemplate}
         <form class="film-card__controls">
           ${watchListTemplate}

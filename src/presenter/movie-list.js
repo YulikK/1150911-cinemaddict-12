@@ -1,21 +1,22 @@
-import {CARD_COUNT_PER_STEP} from "../const.js";
+import {CARD_COUNT_PER_STEP, FilterType} from "../const.js";
 import MoviePresenter from "./movie.js";
 import SortView from "../view/sort.js";
 import MovieSectionView from "../view/movies.js";
 import MovieListView from "../view/movie-list.js";
 import NoMovieView from "../view/no-movie.js";
 import TopListView from "../view/movies-top.js";
+import RecoomentedListView from "../view/movies-recommend.js";
 import MovieListContainerView from "../view/movie-container.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
 import LoadingView from "../view/loading.js";
 import {render, remove} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
-import {sortByDate, sortByRating, getTopRatedMovies} from "../utils/movie.js";
+import {sortByDate, sortByRating, getTopRatedMovies, getMostRecommentedMovies} from "../utils/movie.js";
 import {SortType, UpdateType, UserAction} from "../const.js";
 
 export default class MovieList {
-  constructor(movieContainer, movieDetailsContainer, moviesModel, filterModel, api) {
-
+  constructor(profileElement, movieContainer, movieDetailsContainer, moviesModel, filterModel, api) {
+    this._profileElement = profileElement;
     this._moviesModel = moviesModel;
     this._filterModel = filterModel;
     this._movieContainer = movieContainer;
@@ -31,14 +32,16 @@ export default class MovieList {
     this._sortComponent = null;
     this._showMoreButtonComponent = null;
     this._topRatedComponent = null;
-    this._mostRecommentedComponent = null;
+    this._recommentedComponent = null;
     this._topRatedContainer = null;
+    this._recommentedContainer = null;
 
     this._renderedMovieCount = CARD_COUNT_PER_STEP;
     this._currentSortType = SortType.DEFAULT;
 
     this._moviePresenter = {};
     this._movieTopPresenter = {};
+    this._movieRecommentedPresenter = {};
     this._isLoading = true;
 
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -54,8 +57,14 @@ export default class MovieList {
     this._moviesModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
 
+    this._updateProfile();
     this._renderBoard();
 
+  }
+
+  _updateProfile() {
+    this._profileElement.init(filter[FilterType.HISTORY](this._moviesModel.getMovies()).length);
+    this._profileElement.updateElement();
   }
 
   destroy() {
@@ -67,6 +76,26 @@ export default class MovieList {
 
     this._moviesModel.removeObserver(this._handleModelEvent);
     this._filterModel.removeObserver(this._handleModelEvent);
+  }
+
+  updateState(isOnline) {
+    const movies = this._moviesModel.getMovies();
+    movies.forEach((movie) => {
+      if (this._moviePresenter[movie.id] instanceof Object
+        && this._moviePresenter[movie.id].isDetailsMode()) {
+        this._moviePresenter[movie.id].setCommentsState(isOnline);
+      }
+
+      if (this._movieTopPresenter[movie.id] instanceof Object
+        && this._movieTopPresenter[movie.id].isDetailsMode()) {
+        this._movieTopPresenter[movie.id].setCommentsState(isOnline);
+      }
+
+      if (this._movieRecommentedPresenter[movie.id] instanceof Object
+        && this._movieRecommentedPresenter[movie.id].isDetailsMode()) {
+        this._movieRecommentedPresenter[movie.id].setCommentsState(isOnline);
+      }
+    });
   }
 
   _getMovies() {
@@ -83,51 +112,60 @@ export default class MovieList {
     return filtredMovies;
   }
 
-  _handleViewAction(actionType, updateType, update, container) {
+  _handleViewAction(
+      actionType,
+      updateTypeCard,
+      updateTypePopup,
+      update,
+      container,
+      needUpdateRecommentedSection = false) {
     switch (actionType) {
+
       case UserAction.UPDATE:
         this._api.updateMovie(update)
         .then((movie) =>
           this._api.getComments(movie)
           .then((movieUpdate) => {
-            this._moviesModel.updateMovie(updateType, movieUpdate);
+            this._moviesModel.updateMovie(updateTypeCard, updateTypePopup, movieUpdate);
+            this._updateProfile();
+            if (needUpdateRecommentedSection) {
+              this._initRecommentedSection();
+            }
           }))
-          .catch(() => {
-            if (container === this._topRatedContainer) {
-              this._movieTopPresenter[update.id].setAborting();
-            } else {
-              this._moviePresenter[update.id].setAborting();
+          .catch((err) => {
+            console.log(err); // eslint-disable-line
+            switch (container) {
+              case this._topRatedContainer:
+                if (this._movieTopPresenter[update.id] instanceof Object) {
+                  this._movieTopPresenter[update.id].setAborting();
+                }
+                break;
+              case this._recommentedContainer:
+                if (this._movieRecommentedPresenter[update.id] instanceof Object) {
+                  this._movieRecommentedPresenter[update.id].setAborting();
+                }
+                break;
+              case this._movieListContainerComponent:
+                if (this._moviePresenter[update.id] instanceof Object) {
+                  this._moviePresenter[update.id].setAborting();
+                }
+                break;
             }
           });
         break;
       case UserAction.UPDATE_LOCAL:
-        this._moviesModel.updateMovie(updateType, update);
+        this._moviesModel.updateMovie(updateTypeCard, updateTypePopup, update);
         break;
     }
   }
 
-  _handleModelEvent(updateType, data) {
-    switch (updateType) {
+  _handleModelEvent(updateTypeCard, updateTypePopup, data) {
+    switch (updateTypeCard) {
       case UpdateType.PATCH:
-        if (this._moviePresenter[data.id] !== undefined) {
-          this._moviePresenter[data.id].update(data);
-        }
-
-        if (this._movieTopPresenter[data.id] !== undefined) {
-          this._movieTopPresenter[data.id].update(data);
-        }
-        break;
-      case UpdateType.PATCH_CARD:
-        if (this._moviePresenter[data.id] !== undefined) {
-          this._moviePresenter[data.id].updateCard(data);
-        }
-
-        if (this._movieTopPresenter[data.id] !== undefined) {
-          this._movieTopPresenter[data.id].updateCard(data);
-        }
+        this._updateCardPresenters(data);
         break;
       case UpdateType.MINOR:
-        this._clearBoard();
+        this._clearBoard({resetRenderedMovieCount: true});
         this._renderBoard();
         break;
       case UpdateType.MAJOR:
@@ -137,8 +175,54 @@ export default class MovieList {
       case UpdateType.INIT:
         this._isLoading = false;
         remove(this._loadingComponent);
+        this._clearBoard({resetRenderedMovieCount: true, resetSortType: true});
         this._renderBoard();
         break;
+    }
+
+    switch (updateTypePopup) {
+      case UpdateType.PATCH:
+        this._updatePopupPresenters(data);
+        break;
+      case UpdateType.MINOR:
+        this._updateCommentsPresenters(data);
+        break;
+    }
+  }
+
+  _updateCardPresenters(data) {
+    if (this._moviePresenter[data.id] instanceof Object) {
+      this._moviePresenter[data.id].updateCard(data);
+    }
+    if (this._movieTopPresenter[data.id] instanceof Object) {
+      this._movieTopPresenter[data.id].updateCard(data);
+    }
+    if (this._movieRecommentedPresenter[data.id] instanceof Object) {
+      this._movieRecommentedPresenter[data.id].updateCard(data);
+    }
+  }
+
+  _updatePopupPresenters(data) {
+    if (this._moviePresenter[data.id] instanceof Object) {
+      this._moviePresenter[data.id].updatePopup(data);
+    }
+    if (this._movieTopPresenter[data.id] instanceof Object) {
+      this._movieTopPresenter[data.id].updatePopup(data);
+    }
+    if (this._movieRecommentedPresenter[data.id] instanceof Object) {
+      this._movieRecommentedPresenter[data.id].updatePopup(data);
+    }
+  }
+
+  _updateCommentsPresenters(data) {
+    if (this._moviePresenter[data.id] instanceof Object) {
+      this._moviePresenter[data.id].updateComments();
+    }
+    if (this._movieTopPresenter[data.id] instanceof Object) {
+      this._movieTopPresenter[data.id].updateComments();
+    }
+    if (this._movieRecommentedPresenter[data.id] instanceof Object) {
+      this._movieRecommentedPresenter[data.id].updateComments();
     }
   }
 
@@ -176,7 +260,7 @@ export default class MovieList {
   _renderMovie(movie, container, presenter) {
 
     const moviePresenter = new MoviePresenter(
-        container, // this._movieListContainerComponent,
+        container,
         this._movieDetailsContainer,
         this._handleViewAction,
         this._handleModeChange,
@@ -235,12 +319,14 @@ export default class MovieList {
       .forEach((presenter) => presenter.destroy());
     this._moviePresenter = {};
     this._movieTopPresenter = {};
+    this._movieRecommentedPresenter = {};
 
     remove(this._sortComponent);
     remove(this._noMovieComponent);
     remove(this._showMoreButtonComponent);
     remove(this._loadingComponent);
     remove(this._topRatedComponent);
+    remove(this._recommentedComponent);
 
     if (resetRenderedMovieCount) {
       this._renderedMovieCount = CARD_COUNT_PER_STEP;
@@ -258,6 +344,8 @@ export default class MovieList {
       this._renderLoading();
       return;
     }
+
+    this._updateProfile();
 
     const movies = this._getMovies();
     const movieCount = movies.length;
@@ -279,26 +367,61 @@ export default class MovieList {
       this._renderShowMoreButton();
     }
 
-    const topRatedMovies = getTopRatedMovies(this._moviesModel.getMovies());
+    this._initTopSection();
 
-    if (topRatedMovies.length !== 0) {
-
-      this._renderExtraList(topRatedMovies);
-    }
+    this._initRecommentedSection();
 
   }
 
-  _renderExtraList(topRatedMovies) {
+  _initTopSection() {
 
     if (this._topRatedComponent !== null) {
       this._topRatedComponent = null;
     }
+
+    const topRatedMovies = getTopRatedMovies(this._moviesModel.getMovies());
+
+    if (topRatedMovies.length !== 0) {
+
+      this._renderTopList(topRatedMovies);
+    }
+
+  }
+
+  _initRecommentedSection() {
+
+    if (this._recommentedComponent !== null) {
+      remove(this._recommentedComponent);
+      this._movieRecommentedPresenter = {};
+      this._recommentedComponent = null;
+    }
+
+    const mostRecommentedMovies = getMostRecommentedMovies(this._moviesModel.getMovies());
+
+    if (mostRecommentedMovies.length !== 0) {
+
+      this._renderRecommentedList(mostRecommentedMovies);
+    }
+
+  }
+
+  _renderTopList(topRatedMovies) {
 
     this._topRatedComponent = new TopListView();
     render(this._movieSectionComponent, this._topRatedComponent);
     this._topRatedContainer = this._topRatedComponent.getContainer();
 
     this._renderMovies(topRatedMovies, this._topRatedContainer, this._movieTopPresenter);
+
+  }
+
+  _renderRecommentedList(mostRecommentedMovies) {
+
+    this._recommentedComponent = new RecoomentedListView();
+    render(this._movieSectionComponent, this._recommentedComponent);
+    this._recommentedContainer = this._recommentedComponent.getContainer();
+
+    this._renderMovies(mostRecommentedMovies, this._recommentedContainer, this._movieRecommentedPresenter);
 
   }
 

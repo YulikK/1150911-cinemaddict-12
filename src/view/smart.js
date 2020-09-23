@@ -31,7 +31,7 @@ export default class Smart extends Abstract {
       restoreCallback = this._addWatchListClickHandler;
       elementTemplate = this.getWatchListTemplate();
 
-    } else if (prevMovie.comments !== this._movie.comments) {
+    } else if (JSON.stringify(prevMovie.comments) !== JSON.stringify(this._movie.comments)) {
 
       selectorUpdateElement = `.film-card__comments`;
       restoreCallback = this._movieClickHandler;
@@ -40,7 +40,9 @@ export default class Smart extends Abstract {
 
     }
 
-    this.updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate);
+    if (selectorUpdateElement !== ``) {
+      this.updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate);
+    }
   }
 
   updateData(update) {

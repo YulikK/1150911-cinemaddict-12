@@ -92,7 +92,7 @@ const createMovieDetailsTemplate = (movie) => {
                   <td class="film-details__cell">${country}</td>
                 </tr>
                 <tr class="film-details__row">
-                  <td class="film-details__term">${genres.lenght === 1 ? `Genre` : `Genres`}</td>
+                  <td class="film-details__term">${genres.length === 1 ? `Genre` : `Genres`}</td>
                   <td class="film-details__cell">
                     ${genresTemplate}
                   </td>

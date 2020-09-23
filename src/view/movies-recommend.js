@@ -1,3 +1,5 @@
+import AbstractView from "./abstract.js";
+
 export const createMovieRecommendListTemplate = () => {
   return (
     `<section class="films-list--extra">
@@ -7,3 +9,14 @@ export const createMovieRecommendListTemplate = () => {
     </section>`
   );
 };
+
+export default class RecoomentedList extends AbstractView {
+
+  getTemplate() {
+    return createMovieRecommendListTemplate();
+  }
+
+  getContainer() {
+    return this.getElement().querySelector(`.films-list__container`);
+  }
+}

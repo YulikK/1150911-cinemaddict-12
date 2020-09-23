@@ -3,10 +3,8 @@ import StatisticsView from "./view/statistics.js";
 import FooterStatisticView from "./view/footer-statistic.js";
 import MoviesModel from "./model/movies.js";
 import FilterModel from "./model/filter.js";
-import {generateCountMovies} from "./mock/statistics.js";
 import {render, remove} from "./utils/render.js";
-import {filter} from "./utils/filter.js";
-import {FilterType, MenuItem, UpdateType} from "./const.js";
+import {MenuItem, UpdateType} from "./const.js";
 import MovieListPresenter from "./presenter/movie-list.js";
 import FilterPresenter from "./presenter/filter.js";
 import Api from "./api/index.js";
@@ -25,8 +23,6 @@ const api = new Api(END_POINT, AUTHORIZATION);
 const store = new Store(STORE_NAME, window.localStorage);
 const apiWithProvider = new Provider(api, store);
 
-const allMovies = generateCountMovies();
-
 const moviesModel = new MoviesModel();
 const filterModel = new FilterModel();
 
@@ -35,13 +31,14 @@ const siteHeaderElement = siteBodyElement.querySelector(`.header`);
 const siteMainElement = siteBodyElement.querySelector(`.main`);
 const siteFooterElement = siteBodyElement.querySelector(`.footer`);
 
-render(siteHeaderElement, new ProfileView(filter[FilterType.HISTORY](moviesModel.getMovies()).length));
+const profileElement = new ProfileView();
+render(siteHeaderElement, profileElement);
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, moviesModel);
 
-const movieListPresenter = new MovieListPresenter(siteMainElement, siteBodyElement, moviesModel, filterModel, apiWithProvider);
+const movieListPresenter = new MovieListPresenter(profileElement, siteMainElement, siteBodyElement, moviesModel, filterModel, apiWithProvider);
 
 const siteStatisticsElement = siteFooterElement.querySelector(`.footer__statistics`);
-render(siteStatisticsElement, new FooterStatisticView(allMovies));
+
 
 let statisticsComponent = null;
 
@@ -83,14 +80,16 @@ apiWithProvider.getMovies()
   })
 
   .then((moviesArray) => {
-    moviesModel.setMovies(UpdateType.INIT, moviesArray);
+    moviesModel.setMovies(UpdateType.INIT, UpdateType.NOT, moviesArray);
     filterPresenter.init();
     filterPresenter.setClickHandler(handleSiteMenuClick);
+    render(siteStatisticsElement, new FooterStatisticView(moviesArray.length));
 
   })
 
-  .catch(() => {
-    moviesModel.setMovies(UpdateType.INIT, []);
+  .catch((error) => {
+    console.log(error); // eslint-disable-line
+    moviesModel.setMovies(UpdateType.INIT, UpdateType.NOT, []);
     filterPresenter.init();
     filterPresenter.setClickHandler(handleSiteMenuClick);
 
@@ -109,8 +108,10 @@ window.addEventListener(`load`, () => {
 window.addEventListener(`online`, () => {
   document.title = document.title.replace(`[offline] `, ``);
   apiWithProvider.sync();
+  movieListPresenter.updateState(true);
 });
 
 window.addEventListener(`offline`, () => {
   document.title = `[offline] ` + document.title;
+  movieListPresenter.updateState(false);
 });

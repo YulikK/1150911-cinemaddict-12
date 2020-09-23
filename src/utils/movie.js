@@ -58,7 +58,7 @@ export const sortByRating = (movieA, movieB) => {
   return movieB.rating - movieA.rating;
 };
 
-export const sortByMovieRating = (ratingA, ratingB) => {
+export const sortByCount = (ratingA, ratingB) => {
   const weight = getWeightForNullDate(ratingA, ratingB);
 
   if (weight !== null) {
@@ -84,7 +84,7 @@ export const getTopRatedMovies = (movies) => {
 
   const movieRating = [].concat(...movies.map((movie) => movie.rating));
   const uniqueRating = makeItemsUnique(movieRating);
-  uniqueRating.sort(sortByMovieRating);
+  uniqueRating.sort(sortByCount);
 
   uniqueRating.forEach((rating) => {
 
@@ -104,4 +104,41 @@ export const getTopRatedMovies = (movies) => {
 
   return topRatedMovies;
 
+};
+
+export const getMostRecommentedMovies = (movies) => {
+
+  const mostRecommentedMovies = [];
+  let moviesLast = movies.map((item) => item);
+
+  const movieCommentsCount = [].concat(...movies.map((movie) => movie.comments.length));
+  const uniqueCommentsCount = makeItemsUnique(movieCommentsCount);
+  uniqueCommentsCount.sort(sortByCount);
+
+  uniqueCommentsCount.forEach((commentsCount) => {
+
+    if (commentsCount > 0) {
+      const sameCommentsCountMovie = moviesLast.filter((movie) => movie.comments.length === commentsCount);
+
+      for (let i = 0; i <= sameCommentsCountMovie.length; i++) {
+        let indexRandomMovie = Math.floor(Math.random() * sameCommentsCountMovie.length);
+        if (mostRecommentedMovies.length < 2) {
+          mostRecommentedMovies.push(sameCommentsCountMovie[indexRandomMovie]);
+        }
+        sameCommentsCountMovie.splice(indexRandomMovie, 1);
+      }
+
+    }
+  });
+
+  return mostRecommentedMovies;
+
+};
+
+export const formatMovieDescription = (description) => {
+  if (description.length > 140) {
+    return description.slice(0, 139) + `...`;
+  } else {
+    return description;
+  }
 };

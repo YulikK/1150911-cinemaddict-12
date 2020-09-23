@@ -1,5 +1,5 @@
 import {RATING} from "../const.js";
-import AbstractView from "./abstract.js";
+import Smart from "./smart.js";
 
 const getRating = (watched) => {
 
@@ -29,14 +29,18 @@ const createProfileTemplate = (watched) => {
   );
 };
 
-export default class Profile extends AbstractView {
-  constructor(watched) {
-    super();
+export default class Profile extends Smart {
+
+  init(watched) {
     this._watched = watched;
   }
 
   getTemplate() {
     return createProfileTemplate(this._watched);
+  }
+
+  restoreHandlers() {
+
   }
 
 }

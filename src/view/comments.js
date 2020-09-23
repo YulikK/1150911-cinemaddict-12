@@ -121,6 +121,17 @@ export default class Comments extends SmartView {
     this.updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate);
   }
 
+  setCommentsState(isOnline) {
+    const commentElements = this.getElement().querySelectorAll(`.film-details__comments-wrap button, .film-details__comments-wrap textarea, .film-details__comments-wrap input`);
+    commentElements.forEach((element) => {
+      if (!isOnline) {
+        element.setAttribute(`disabled`, `disabled`);
+      } else {
+        element.removeAttribute(`disabled`);
+      }
+    });
+  }
+
   _deleteClickHandler(evt) {
     evt.preventDefault();
     const commentId = this._getElementById(evt.target.value);
