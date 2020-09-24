@@ -114,9 +114,9 @@ export default class Comments extends SmartView {
   }
 
   setDeletingState(comment, isDisabled) {
-    let selectorUpdateElement = `button[value="${comment.id}"]`;
-    let elementTemplate = deleteCommentTemplate(comment.id, isDisabled);
-    let restoreCallback = this._deleteClickHandler;
+    const selectorUpdateElement = `button[value="${comment.id}"]`;
+    const elementTemplate = deleteCommentTemplate(comment.id, isDisabled);
+    const restoreCallback = this._deleteClickHandler;
 
     this.updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate);
   }

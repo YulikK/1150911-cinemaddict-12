@@ -71,7 +71,7 @@ export const sortByCount = (ratingA, ratingB) => {
 export const getTopRatedMovies = (movies) => {
 
   const topRatedMovies = [];
-  let moviesLast = movies.map((item) => item);
+  const moviesLast = movies.map((item) => item);
 
   const movieRating = [].concat(...movies.map((movie) => movie.rating));
   const uniqueRating = makeItemsUnique(movieRating);
@@ -83,7 +83,7 @@ export const getTopRatedMovies = (movies) => {
       const sameRateMovie = moviesLast.filter((movie) => movie.rating === rating);
 
       for (let i = 0; i <= sameRateMovie.length; i++) {
-        let indexRandomMovie = Math.floor(Math.random() * sameRateMovie.length);
+        const indexRandomMovie = Math.floor(Math.random() * sameRateMovie.length);
         if (topRatedMovies.length < 2) {
           topRatedMovies.push(sameRateMovie[indexRandomMovie]);
         }
@@ -100,7 +100,7 @@ export const getTopRatedMovies = (movies) => {
 export const getMostRecommendedMovies = (movies) => {
 
   const mostRecommendedMovies = [];
-  let moviesLast = movies.map((item) => item);
+  const moviesLast = movies.map((item) => item);
 
   const movieCommentsCount = [].concat(...movies.map((movie) => movie.comments.length));
   const uniqueCommentsCount = makeItemsUnique(movieCommentsCount);
@@ -112,7 +112,7 @@ export const getMostRecommendedMovies = (movies) => {
       const sameCommentsCountMovie = moviesLast.filter((movie) => movie.comments.length === commentsCount);
 
       for (let i = 0; i <= sameCommentsCountMovie.length; i++) {
-        let indexRandomMovie = Math.floor(Math.random() * sameCommentsCountMovie.length);
+        const indexRandomMovie = Math.floor(Math.random() * sameCommentsCountMovie.length);
         if (mostRecommendedMovies.length < 2) {
           mostRecommendedMovies.push(sameCommentsCountMovie[indexRandomMovie]);
         }
