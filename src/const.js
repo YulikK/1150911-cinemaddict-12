@@ -33,7 +33,6 @@ export const UserAction = {
 
 export const UpdateType = {
   PATCH: `PATCH`,
-  PATCH_CARD: `PATCH CARD`,
   MINOR: `MINOR`,
   MAJOR: `MAJOR`,
   INIT: `INIT`

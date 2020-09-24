@@ -2,6 +2,7 @@ import MovieView from "../view/movie.js";
 import MovieDetailsView from "../view/movie-details.js";
 import CommentsView from "../view/comments.js";
 import CommentsModel from "../model/comments.js";
+import Provider from "../api/provider.js";
 import {render, hideDetails, showDetails, remove} from "../utils/render.js";
 import {Mode, UserAction, UpdateType, FilterType} from "../const.js";
 
@@ -20,6 +21,7 @@ export default class Movie {
     this._changeMode = changeMode;
     this._changeFilter = changeFilter;
     this._api = api;
+    this._needMovieList = false;
 
     this._movieComponent = null;
     this._movieDetailsComponent = null;
@@ -37,8 +39,6 @@ export default class Movie {
     this._enterKeyDownHandler = this._enterKeyDownHandler.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
-    this._handleModelEvent = this._handleModelEvent.bind(this);
-
 
   }
 
@@ -53,9 +53,7 @@ export default class Movie {
 
     this._initPopup();
 
-    this._setListenersComponent();
-
-    this._commentsModel.addObserver(this._handleModelEvent);
+    this._setListenersCardComponent();
 
     render(this._movieContainer, this._movieComponent);
 
@@ -64,24 +62,41 @@ export default class Movie {
   _initPopup() {
     this._movieDetailsComponent = new MovieDetailsView(this._movie, this._commentsModel.getComments());
     this._renderComments();
-  }
-
-  update(movie) {
-    this._movie = movie;
-    this._movieComponent.update(this._movie);
-    this._movieDetailsComponent.update(this._movie, true);
-
+    this._setListenersDetailsComponent();
   }
 
   updateCard(movie) {
-    this._movie = movie;
-    this._movieComponent.update(this._movie);
+    if (movie instanceof Object) {
+      this._movie = movie;
+      this._movieComponent.update(movie);
+    }
+
+  }
+
+  updatePopup(movie) {
+    if (movie instanceof Object) {
+      this._movie = movie;
+      this._movieDetailsComponent.update(movie, true);
+    }
+  }
+
+  updateComments() {
+    this._clearComments();
+    this._renderComments();
+  }
+
+  isDetailsMode() {
+    return this._mode === Mode.DETAILS;
   }
 
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._hideMovieDetails();
     }
+  }
+
+  getCard() {
+    return this._movieComponent.getElement();
   }
 
   setAborting() {
@@ -94,7 +109,7 @@ export default class Movie {
     this._movieComponent.shake(resetFormState);
   }
 
-  _handleViewAction(actionType, updateType, update) {
+  _handleViewAction(actionType, updateTypeCard, updateTypeDetails, update) {
     const resetFormState = () => {
       this._movieDetailsComponent.setState();
     };
@@ -107,17 +122,20 @@ export default class Movie {
       case UserAction.ADD:
         this._api.addComment(this._movie, update)
         .then((response) => {
-          this._commentsModel.addComment(updateType, response);
+          this._commentsModel.addComment(updateTypeCard, updateTypeDetails, response);
           this._changeData(
-              UserAction.UPDATE_LOCAL,
-              UpdateType.PATCH_CARD,
+              UserAction.UPDATE,
+              updateTypeCard, // карточка
+              updateTypeDetails, // попап
               Object.assign(
                   {},
                   this._movie,
                   {
                     comments: this._commentsModel.getComments()
                   }
-              )
+              ),
+              this._movieContainer,
+              true
           );
           this._movieDetailsComponent.setState();
         })
@@ -128,17 +146,20 @@ export default class Movie {
       case UserAction.DELETE:
         this._api.deleteComment(update)
         .then(() => {
-          this._commentsModel.deleteComment(updateType, update);
+          this._commentsModel.deleteComment(updateTypeCard, updateTypeDetails, update);
           this._changeData(
               UserAction.UPDATE,
-              UpdateType.PATCH_CARD,
+              updateTypeCard, // карточка
+              updateTypeDetails, // попап
               Object.assign(
                   {},
                   this._movie,
                   {
                     comments: this._commentsModel.getComments()
                   }
-              )
+              ),
+              this._movieContainer,
+              true
           );
         })
         .catch(() => {
@@ -148,22 +169,14 @@ export default class Movie {
     }
   }
 
-  _handleModelEvent(updateType) {
-    switch (updateType) {
-      case UpdateType.MINOR:
-        this._clearComments();
-        this._renderComments();
-        break;
-    }
+  _setListenersCardComponent() {
+    this._movieComponent.setMovieClickHandler(this._handleMovieClick);
+    this._setCommonListeners(this._movieComponent);
   }
 
-  _setListenersComponent() {
-    this._movieComponent.setMovieClickHandler(this._handleMovieClick);
+  _setListenersDetailsComponent() {
     this._movieDetailsComponent.setCloseClickHandler(this._handleCloseButtonClick);
-
-    this._setCommonListeners(this._movieComponent);
     this._setCommonListeners(this._movieDetailsComponent);
-
   }
 
   _setCommonListeners(component) {
@@ -179,10 +192,15 @@ export default class Movie {
 
   _showMovieDetails() {
     showDetails(this._movieDetailsContainer, this._movieDetailsComponent);
+    this.setCommentsState(Provider.isOnline());
     document.addEventListener(`keydown`, this._escKeyDownHandler);
     document.addEventListener(`keydown`, this._enterKeyDownHandler);
     this._changeMode();
     this._mode = Mode.DETAILS;
+  }
+
+  setCommentsState(isOnline) {
+    this._commentsComponent.setCommentsState(isOnline);
   }
 
   _renderComments() {
@@ -204,20 +222,21 @@ export default class Movie {
 
   }
 
-
   _hideMovieDetails() {
-    const preMode = this._mode;
     hideDetails(this._movieDetailsContainer, this._movieDetailsComponent);
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
     document.removeEventListener(`keydown`, this._enterKeyDownHandler);
     this._mode = Mode.DEFAULT;
 
-    if (preMode === Mode.DETAILS & this._changeFilter !== FilterType.ALL) {
+    if (this._needMovieList) {
       this._changeData(
           UserAction.UPDATE,
           UpdateType.MINOR,
-          this._movie
+          null,
+          this._movie,
+          this._movieContainer
       );
+      this._needMovieList = false;
     }
     this._initPopup();
   }
@@ -225,21 +244,25 @@ export default class Movie {
   _handleFavoriteClick() {
     this._changeData(
         UserAction.UPDATE,
-        this._changeFilter === FilterType.ALL || this._mode === Mode.DETAILS ? UpdateType.PATCH : UpdateType.MINOR,
+        this._changeFilter !== FilterType.FAVORITES || this._mode === Mode.DETAILS ? UpdateType.PATCH : UpdateType.MINOR, // карточка
+        UpdateType.PATCH, // попап
         Object.assign(
             {},
             this._movie,
             {
               isFavorite: !this._movie.isFavorite
             }
-        )
+        ),
+        this._movieContainer
     );
+    this._needMovieList = this._changeFilter === FilterType.FAVORITES && this._mode === Mode.DETAILS;
   }
 
   _handleWatchedClick() {
     this._changeData(
         UserAction.UPDATE,
-        this._changeFilter === FilterType.ALL || this._mode === Mode.DETAILS ? UpdateType.PATCH : UpdateType.MINOR,
+        this._changeFilter !== FilterType.HISTORY || this._mode === Mode.DETAILS ? UpdateType.PATCH : UpdateType.MINOR, // карточка
+        UpdateType.PATCH, // попап
         Object.assign(
             {},
             this._movie,
@@ -247,22 +270,27 @@ export default class Movie {
               isWatched: !this._movie.isWatched,
               watchingDate: this._movie.isWatched ? null : new Date()
             }
-        )
+        ),
+        this._movieContainer
     );
+    this._needMovieList = this._changeFilter === FilterType.HISTORY && this._mode === Mode.DETAILS;
   }
 
   _handleAddWatchListClick() {
     this._changeData(
         UserAction.UPDATE,
-        this._changeFilter === FilterType.ALL || this._mode === Mode.DETAILS ? UpdateType.PATCH : UpdateType.MINOR,
+        this._changeFilter !== FilterType.WATCHLIST || this._mode === Mode.DETAILS ? UpdateType.PATCH : UpdateType.MINOR, // карточка
+        UpdateType.PATCH, // попап
         Object.assign(
             {},
             this._movie,
             {
               isWatchList: !this._movie.isWatchList
             }
-        )
+        ),
+        this._movieContainer
     );
+    this._needMovieList = this._changeFilter === FilterType.WATCHLIST && this._mode === Mode.DETAILS;
   }
 
   _handleMovieClick() {
@@ -287,22 +315,26 @@ export default class Movie {
   _enterKeyDownHandler(evt) {
 
     if ((evt.ctrlKey) && ((evt.keyCode === 0xA) || (evt.keyCode === 0xD))) {
-      this._movieDetailsComponent.setState(true);
-      evt.preventDefault();
-      const update = {
-        text: this._commentsComponent.getNewComment(),
-        emotion: this._commentsComponent.getNewEmoji(),
-        date: new Date(),
-      };
-      this._handleAddComment(update);
+      if (Provider.isOnline()) {
+        this._movieDetailsComponent.setState(true);
+        evt.preventDefault();
+        const update = {
+          text: this._commentsComponent.getNewComment(),
+          emotion: this._commentsComponent.getNewEmoji(),
+          date: new Date(),
+        };
+        this._handleAddComment(update);
+      } else {
+        this.setAborting();
+      }
     }
   }
 
   _handleDeleteClick(update) {
-    this._handleViewAction(UserAction.DELETE, UpdateType.MINOR, update);
+    this._handleViewAction(UserAction.DELETE, UpdateType.PATCH, UpdateType.MINOR, update);
   }
 
   _handleAddComment(update) {
-    this._handleViewAction(UserAction.ADD, UpdateType.MINOR, update);
+    this._handleViewAction(UserAction.ADD, UpdateType.PATCH, UpdateType.MINOR, update);
   }
 }

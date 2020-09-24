@@ -1,5 +1,5 @@
 import moment from "moment";
-import {getRandomInteger} from "../utils/common.js";
+import {makeItemsUnique} from "../utils/common.js";
 
 export const formatMovieDuration = (duration) => {
   const hours = moment.duration(duration, `minutes`).hours();
@@ -12,6 +12,13 @@ export const formatMovieDate = (date, format) => {
     return ``;
   }
   return moment(date).format(format);
+};
+
+export const formatCommentDate = (date) => {
+  if (!(date instanceof Date)) {
+    return ``;
+  }
+  return moment(date).fromNow(moment());
 };
 
 const getWeightForNullDate = (dateA, dateB) => {
@@ -38,7 +45,7 @@ export const sortByDate = (movieA, movieB) => {
     return weight;
   }
 
-  return movieA.date.getTime() - movieB.date.getTime();
+  return movieB.date.getTime() - movieA.date.getTime();
 };
 
 export const sortByRating = (movieA, movieB) => {
@@ -51,11 +58,78 @@ export const sortByRating = (movieA, movieB) => {
   return movieB.rating - movieA.rating;
 };
 
-export const getRandomName = () => {
-  const autors = [
-    `Igor`,
-    `Maks`,
-    `Anna`
-  ];
-  return autors[getRandomInteger(0, autors.length - 1)];
+export const sortByCount = (ratingA, ratingB) => {
+  const weight = getWeightForNullDate(ratingA, ratingB);
+
+  if (weight !== null) {
+    return weight;
+  }
+
+  return ratingB - ratingA;
+};
+
+export const getTopRatedMovies = (movies) => {
+
+  const topRatedMovies = [];
+  let moviesLast = movies.map((item) => item);
+
+  const movieRating = [].concat(...movies.map((movie) => movie.rating));
+  const uniqueRating = makeItemsUnique(movieRating);
+  uniqueRating.sort(sortByCount);
+
+  uniqueRating.forEach((rating) => {
+
+    if (rating > 0) {
+      const sameRateMovie = moviesLast.filter((movie) => movie.rating === rating);
+
+      for (let i = 0; i <= sameRateMovie.length; i++) {
+        let indexRandomMovie = Math.floor(Math.random() * sameRateMovie.length);
+        if (topRatedMovies.length < 2) {
+          topRatedMovies.push(sameRateMovie[indexRandomMovie]);
+        }
+        sameRateMovie.splice(indexRandomMovie, 1);
+      }
+
+    }
+  });
+
+  return topRatedMovies;
+
+};
+
+export const getMostRecommendedMovies = (movies) => {
+
+  const mostRecommendedMovies = [];
+  let moviesLast = movies.map((item) => item);
+
+  const movieCommentsCount = [].concat(...movies.map((movie) => movie.comments.length));
+  const uniqueCommentsCount = makeItemsUnique(movieCommentsCount);
+  uniqueCommentsCount.sort(sortByCount);
+
+  uniqueCommentsCount.forEach((commentsCount) => {
+
+    if (commentsCount > 0) {
+      const sameCommentsCountMovie = moviesLast.filter((movie) => movie.comments.length === commentsCount);
+
+      for (let i = 0; i <= sameCommentsCountMovie.length; i++) {
+        let indexRandomMovie = Math.floor(Math.random() * sameCommentsCountMovie.length);
+        if (mostRecommendedMovies.length < 2) {
+          mostRecommendedMovies.push(sameCommentsCountMovie[indexRandomMovie]);
+        }
+        sameCommentsCountMovie.splice(indexRandomMovie, 1);
+      }
+
+    }
+  });
+
+  return mostRecommendedMovies;
+
+};
+
+export const formatMovieDescription = (description) => {
+  if (description.length > 140) {
+    return description.slice(0, 139) + `...`;
+  } else {
+    return description;
+  }
 };

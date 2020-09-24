@@ -1,5 +1,5 @@
 import he from "he";
-import {formatMovieDate} from "../utils/movie.js";
+import {formatCommentDate} from "../utils/movie.js";
 import SmartView from "./smart.js";
 import {EMOTIONS} from "../const.js";
 
@@ -21,7 +21,7 @@ const createCommentTemplate = (comment) => {
         <p class="film-details__comment-text">${he.encode(text)}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${autor}</span>
-          <span class="film-details__comment-day">${formatMovieDate(date, `YYYY/MM/DD HH:MM`)}</span>
+          <span class="film-details__comment-day">${formatCommentDate(date)}</span>
           ${deleteTemplate}
         </p>
       </div>
@@ -119,6 +119,17 @@ export default class Comments extends SmartView {
     let restoreCallback = this._deleteClickHandler;
 
     this.updateMovieElement(selectorUpdateElement, restoreCallback, elementTemplate);
+  }
+
+  setCommentsState(isOnline) {
+    const commentElements = this.getElement().querySelectorAll(`.film-details__comments-wrap button, .film-details__comments-wrap textarea, .film-details__comments-wrap input`);
+    commentElements.forEach((element) => {
+      if (!isOnline) {
+        element.setAttribute(`disabled`, `disabled`);
+      } else {
+        element.removeAttribute(`disabled`);
+      }
+    });
   }
 
   _deleteClickHandler(evt) {

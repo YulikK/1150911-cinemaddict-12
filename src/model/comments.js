@@ -14,13 +14,13 @@ export default class Comments extends Observer {
     return this._comments;
   }
 
-  addComment(updateType, update) {
+  addComment(updateTypeCard, updateTypeDetails, update) {
     this._comments = update.slice();
 
-    this._notify(updateType, update);
+    this._notify(updateTypeCard, updateTypeDetails, update);
   }
 
-  deleteComment(updateType, update) {
+  deleteComment(updateTypeCard, updateTypeDetails, update) {
     const index = this._comments.findIndex((comment) => comment.id === update.id);
     if (index === -1) {
       throw new Error(`Can't delete unexisting comment`);
@@ -31,7 +31,7 @@ export default class Comments extends Observer {
       ...this._comments.slice(index + 1)
     ];
 
-    this._notify(updateType);
+    this._notify(updateTypeCard, updateTypeDetails);
   }
 
   static adaptToClient(comment) {

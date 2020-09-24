@@ -6,16 +6,16 @@ export default class Movies extends Observer {
     this._movies = [];
   }
 
-  setMovies(updateType, movies) {
+  setMovies(updateTypeCard, updateTypeDetails, movies) {
     this._movies = movies.slice();
-    this._notify(updateType);
+    this._notify(updateTypeCard, updateTypeDetails);
   }
 
   getMovies() {
     return this._movies;
   }
 
-  updateMovie(updateType, update) {
+  updateMovie(updateTypeCard, updateTypePopup, update) {
     const index = this._movies.findIndex((movie) => movie.id === update.id);
 
     if (index === -1) {
@@ -28,7 +28,7 @@ export default class Movies extends Observer {
       ...this._movies.slice(index + 1)
     ];
 
-    this._notify(updateType, update);
+    this._notify(updateTypeCard, updateTypePopup, update);
   }
 
   static adaptToClient(movie) {
@@ -118,7 +118,13 @@ export default class Movies extends Observer {
   }
 
   static _adaptComments(comments) {
-    return comments.map((comment) => comment.id);
+    return comments.map((comment) => {
+      if (comment instanceof Object) {
+        return comment.id;
+      } else {
+        return comment;
+      }
+    });
   }
 
 
