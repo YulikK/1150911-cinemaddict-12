@@ -1,6 +1,6 @@
 import AbstractView from "./abstract.js";
 
-export const createMovieRecommendListTemplate = () => {
+export const createRecommendedTemplate = () => {
   return (
     `<section class="films-list--extra">
       <h2 class="films-list__title">Most commented</h2>
@@ -13,7 +13,7 @@ export const createMovieRecommendListTemplate = () => {
 export default class RecommendedList extends AbstractView {
 
   getTemplate() {
-    return createMovieRecommendListTemplate();
+    return createRecommendedTemplate();
   }
 
   getContainer() {
