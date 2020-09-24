@@ -41,7 +41,7 @@ export default class MovieList {
 
     this._moviePresenter = {};
     this._movieTopPresenter = {};
-    this._movieRecommentedPresenter = {};
+    this._movieRecommendedPresenter = {};
     this._isLoading = true;
 
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -91,9 +91,9 @@ export default class MovieList {
         this._movieTopPresenter[movie.id].setCommentsState(isOnline);
       }
 
-      if (this._movieRecommentedPresenter[movie.id] instanceof Object
-        && this._movieRecommentedPresenter[movie.id].isDetailsMode()) {
-        this._movieRecommentedPresenter[movie.id].setCommentsState(isOnline);
+      if (this._movieRecommendedPresenter[movie.id] instanceof Object
+        && this._movieRecommendedPresenter[movie.id].isDetailsMode()) {
+        this._movieRecommendedPresenter[movie.id].setCommentsState(isOnline);
       }
     });
   }
@@ -118,7 +118,7 @@ export default class MovieList {
       updateTypePopup,
       update,
       container,
-      needUpdateRecommentedSection = false) {
+      needUpdateRecommendedSection = false) {
     switch (actionType) {
 
       case UserAction.UPDATE:
@@ -128,8 +128,8 @@ export default class MovieList {
           .then((movieUpdate) => {
             this._moviesModel.updateMovie(updateTypeCard, updateTypePopup, movieUpdate);
             this._updateProfile();
-            if (needUpdateRecommentedSection) {
-              this._initRecommentedSection();
+            if (needUpdateRecommendedSection) {
+              this._initRecommendedSection();
             }
           }))
           .catch(() => {
@@ -140,8 +140,8 @@ export default class MovieList {
                 }
                 break;
               case this._recommendedContainer:
-                if (this._movieRecommentedPresenter[update.id] instanceof Object) {
-                  this._movieRecommentedPresenter[update.id].setAborting();
+                if (this._movieRecommendedPresenter[update.id] instanceof Object) {
+                  this._movieRecommendedPresenter[update.id].setAborting();
                 }
                 break;
               case this._movieListContainerComponent:
@@ -196,8 +196,8 @@ export default class MovieList {
     if (this._movieTopPresenter[data.id] instanceof Object) {
       this._movieTopPresenter[data.id].updateCard(data);
     }
-    if (this._movieRecommentedPresenter[data.id] instanceof Object) {
-      this._movieRecommentedPresenter[data.id].updateCard(data);
+    if (this._movieRecommendedPresenter[data.id] instanceof Object) {
+      this._movieRecommendedPresenter[data.id].updateCard(data);
     }
   }
 
@@ -208,8 +208,8 @@ export default class MovieList {
     if (this._movieTopPresenter[data.id] instanceof Object) {
       this._movieTopPresenter[data.id].updatePopup(data);
     }
-    if (this._movieRecommentedPresenter[data.id] instanceof Object) {
-      this._movieRecommentedPresenter[data.id].updatePopup(data);
+    if (this._movieRecommendedPresenter[data.id] instanceof Object) {
+      this._movieRecommendedPresenter[data.id].updatePopup(data);
     }
   }
 
@@ -220,8 +220,8 @@ export default class MovieList {
     if (this._movieTopPresenter[data.id] instanceof Object) {
       this._movieTopPresenter[data.id].updateComments();
     }
-    if (this._movieRecommentedPresenter[data.id] instanceof Object) {
-      this._movieRecommentedPresenter[data.id].updateComments();
+    if (this._movieRecommendedPresenter[data.id] instanceof Object) {
+      this._movieRecommendedPresenter[data.id].updateComments();
     }
   }
 
@@ -318,7 +318,7 @@ export default class MovieList {
       .forEach((presenter) => presenter.destroy());
     this._moviePresenter = {};
     this._movieTopPresenter = {};
-    this._movieRecommentedPresenter = {};
+    this._movieRecommendedPresenter = {};
 
     remove(this._sortComponent);
     remove(this._noMovieComponent);
@@ -368,7 +368,7 @@ export default class MovieList {
 
     this._initTopSection();
 
-    this._initRecommentedSection();
+    this._initRecommendedSection();
 
   }
 
@@ -387,19 +387,19 @@ export default class MovieList {
 
   }
 
-  _initRecommentedSection() {
+  _initRecommendedSection() {
 
     if (this._recommendedComponent !== null) {
       remove(this._recommendedComponent);
-      this._movieRecommentedPresenter = {};
+      this._movieRecommendedPresenter = {};
       this._recommendedComponent = null;
     }
 
-    const mostRecommentedMovies = getMostRecommendedMovies(this._moviesModel.getMovies());
+    const mostRecommendedMovies = getMostRecommendedMovies(this._moviesModel.getMovies());
 
-    if (mostRecommentedMovies.length !== 0) {
+    if (mostRecommendedMovies.length !== 0) {
 
-      this._renderRecommentedList(mostRecommentedMovies);
+      this._renderRecommendedList(mostRecommendedMovies);
     }
 
   }
@@ -414,13 +414,13 @@ export default class MovieList {
 
   }
 
-  _renderRecommentedList(mostRecommentedMovies) {
+  _renderRecommendedList(mostRecommendedMovies) {
 
     this._recommendedComponent = new RecommendedListView();
     render(this._movieSectionComponent, this._recommendedComponent);
     this._recommendedContainer = this._recommendedComponent.getContainer();
 
-    this._renderMovies(mostRecommentedMovies, this._recommendedContainer, this._movieRecommentedPresenter);
+    this._renderMovies(mostRecommendedMovies, this._recommendedContainer, this._movieRecommendedPresenter);
 
   }
 

@@ -10,7 +10,7 @@ export const createMovieRecommendListTemplate = () => {
   );
 };
 
-export default class RecoomentedList extends AbstractView {
+export default class RecommendedList extends AbstractView {
 
   getTemplate() {
     return createMovieRecommendListTemplate();

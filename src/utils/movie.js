@@ -99,7 +99,7 @@ export const getTopRatedMovies = (movies) => {
 
 export const getMostRecommendedMovies = (movies) => {
 
-  const mostRecommentedMovies = [];
+  const mostRecommendedMovies = [];
   let moviesLast = movies.map((item) => item);
 
   const movieCommentsCount = [].concat(...movies.map((movie) => movie.comments.length));
@@ -113,8 +113,8 @@ export const getMostRecommendedMovies = (movies) => {
 
       for (let i = 0; i <= sameCommentsCountMovie.length; i++) {
         let indexRandomMovie = Math.floor(Math.random() * sameCommentsCountMovie.length);
-        if (mostRecommentedMovies.length < 2) {
-          mostRecommentedMovies.push(sameCommentsCountMovie[indexRandomMovie]);
+        if (mostRecommendedMovies.length < 2) {
+          mostRecommendedMovies.push(sameCommentsCountMovie[indexRandomMovie]);
         }
         sameCommentsCountMovie.splice(indexRandomMovie, 1);
       }
@@ -122,7 +122,7 @@ export const getMostRecommendedMovies = (movies) => {
     }
   });
 
-  return mostRecommentedMovies;
+  return mostRecommendedMovies;
 
 };
 
