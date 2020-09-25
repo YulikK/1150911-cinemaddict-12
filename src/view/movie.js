@@ -92,26 +92,6 @@ export default class Movie extends SmartView {
     }
   }
 
-  _movieClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.movieClick();
-  }
-
-  _favoriteClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.favoriteClick();
-  }
-
-  _watchedClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.watchedClick();
-  }
-
-  _addWatchListClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.addWatchListClick();
-  }
-
   setMovieClickHandler(callback) {
     this._callback.movieClick = callback;
     this.getElement().querySelector(`.film-card__poster`).addEventListener(`click`, this._movieClickHandler);
@@ -132,5 +112,25 @@ export default class Movie extends SmartView {
   setAddWatchListClickHandler(callback) {
     this._callback.addWatchListClick = callback;
     this.getElement().querySelector(`.film-card__controls-item--add-to-watchlist`).addEventListener(`click`, this._addWatchListClickHandler);
+  }
+
+  _movieClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.movieClick();
+  }
+
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
+  _watchedClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchedClick();
+  }
+
+  _addWatchListClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.addWatchListClick();
   }
 }

@@ -4,13 +4,14 @@ import CommentsView from "../view/comments.js";
 import CommentsModel from "../model/comments.js";
 import Provider from "../api/provider.js";
 import {render, hideDetails, showDetails, remove} from "../utils/render.js";
-import {Mode, UserAction, UpdateType, FilterType} from "../const.js";
+import {Mode, UserAction, UpdateType, FilterType, KeyType} from "../const.js";
 
 export default class Movie {
   constructor(
       movieContainer,
       movieDetailsContainer,
       changeData,
+      changeRecommendedSection,
       changeMode,
       changeFilter,
       api
@@ -19,9 +20,11 @@ export default class Movie {
     this._movieDetailsContainer = movieDetailsContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._changeRecommendedSection = changeRecommendedSection;
     this._changeFilter = changeFilter;
     this._api = api;
-    this._needMovieList = false;
+    this._needMovieListUpdate = false;
+    this._needRecommendedSectionUpdate = false;
 
     this._movieComponent = null;
     this._movieDetailsComponent = null;
@@ -42,6 +45,10 @@ export default class Movie {
 
   }
 
+  getCard() {
+    return this._movieComponent.getElement();
+  }
+
   init(movie) {
     this._movie = movie;
 
@@ -59,25 +66,21 @@ export default class Movie {
 
   }
 
-  _initPopup() {
-    this._movieDetailsComponent = new MovieDetailsView(this._movie, this._commentsModel.getComments());
-    this._renderComments();
-    this._setListenersDetailsComponent();
+  destroy() {
+    remove(this._movieComponent);
+    remove(this._movieDetailsComponent);
   }
 
   updateCard(movie) {
-    if (movie instanceof Object) {
-      this._movie = movie;
-      this._movieComponent.update(movie);
-    }
+
+    this._movie = movie;
+    this._movieComponent.update(movie);
 
   }
 
   updatePopup(movie) {
-    if (movie instanceof Object) {
-      this._movie = movie;
-      this._movieDetailsComponent.update(movie, true);
-    }
+    this._movie = movie;
+    this._movieDetailsComponent.update(movie, true);
   }
 
   updateComments() {
@@ -95,10 +98,6 @@ export default class Movie {
     }
   }
 
-  getCard() {
-    return this._movieComponent.getElement();
-  }
-
   setAborting() {
     const resetFormState = () => {
       this._movieDetailsComponent.setState();
@@ -107,6 +106,85 @@ export default class Movie {
 
     this._movieDetailsComponent.shake(resetFormState);
     this._movieComponent.shake(resetFormState);
+  }
+
+  setCommentsState(isOnline) {
+    this._commentsComponent.setCommentsState(isOnline);
+  }
+
+  _initPopup() {
+    this._movieDetailsComponent = new MovieDetailsView(this._movie);
+    this._renderComments();
+    this._setListenersDetailsComponent();
+  }
+
+  _setListenersCardComponent() {
+    this._movieComponent.setMovieClickHandler(this._handleMovieClick);
+    this._setCommonListeners(this._movieComponent);
+  }
+
+  _setListenersDetailsComponent() {
+    this._movieDetailsComponent.setCloseClickHandler(this._handleCloseButtonClick);
+    this._setCommonListeners(this._movieDetailsComponent);
+  }
+
+  _setCommonListeners(component) {
+    component.setFavoriteClickHandler(this._handleFavoriteClick);
+    component.setWatchedClickHandler(this._handleWatchedClick);
+    component.setAddWatchListClickHandler(this._handleAddWatchListClick);
+  }
+
+  _showMovieDetails() {
+    showDetails(this._movieDetailsContainer, this._movieDetailsComponent);
+    this.setCommentsState(Provider.isOnline());
+    document.addEventListener(`keydown`, this._escKeyDownHandler);
+    document.addEventListener(`keydown`, this._enterKeyDownHandler);
+    this._changeMode();
+    this._mode = Mode.DETAILS;
+  }
+
+  _renderComments() {
+
+    if (this._commentsComponent !== null) {
+      this._commentsComponent = null;
+    }
+
+    this._commentsModel.setComments(this._movie.comments);
+    this._commentsComponent = new CommentsView(this._commentsModel.getComments());
+    this._commentsComponent.setDeleteClickHandler(this._handleDeleteClick);
+    this._commentsComponent.setEmojiClickHandler(this._handleEmojiChange);
+
+    render(this._movieDetailsComponent.getFormElement(), this._commentsComponent);
+  }
+
+  _clearComments() {
+
+    remove(this._commentsComponent);
+
+  }
+
+  _hideMovieDetails() {
+    hideDetails(this._movieDetailsContainer, this._movieDetailsComponent);
+    document.removeEventListener(`keydown`, this._escKeyDownHandler);
+    document.removeEventListener(`keydown`, this._enterKeyDownHandler);
+    this._mode = Mode.DEFAULT;
+
+    if (this._needMovieListUpdate) {
+      this._changeData(
+          UserAction.UPDATE,
+          UpdateType.MINOR,
+          null,
+          this._movie,
+          this._movieContainer
+      );
+      this._needMovieListUpdate = false;
+
+    }
+    if (this._needRecommendedSectionUpdate) {
+      this._changeRecommendedSection();
+      this._needRecommendedListUpdate = false;
+    }
+    this._initPopup();
   }
 
   _handleViewAction(actionType, updateTypeCard, updateTypeDetails, update) {
@@ -134,9 +212,9 @@ export default class Movie {
                     comments: this._commentsModel.getComments()
                   }
               ),
-              this._movieContainer,
-              true
+              this._movieContainer
           );
+          this._needRecommendedSectionUpdate = true;
           this._movieDetailsComponent.setState();
         })
         .catch(() => {
@@ -158,87 +236,15 @@ export default class Movie {
                     comments: this._commentsModel.getComments()
                   }
               ),
-              this._movieContainer,
-              true
+              this._movieContainer
           );
+          this._needRecommendedSectionUpdate = true;
         })
         .catch(() => {
           this._commentsComponent.shake(resetButtonState);
         });
         break;
     }
-  }
-
-  _setListenersCardComponent() {
-    this._movieComponent.setMovieClickHandler(this._handleMovieClick);
-    this._setCommonListeners(this._movieComponent);
-  }
-
-  _setListenersDetailsComponent() {
-    this._movieDetailsComponent.setCloseClickHandler(this._handleCloseButtonClick);
-    this._setCommonListeners(this._movieDetailsComponent);
-  }
-
-  _setCommonListeners(component) {
-    component.setFavoriteClickHandler(this._handleFavoriteClick);
-    component.setWatchedClickHandler(this._handleWatchedClick);
-    component.setAddWatchListClickHandler(this._handleAddWatchListClick);
-  }
-
-  destroy() {
-    remove(this._movieComponent);
-    remove(this._movieDetailsComponent);
-  }
-
-  _showMovieDetails() {
-    showDetails(this._movieDetailsContainer, this._movieDetailsComponent);
-    this.setCommentsState(Provider.isOnline());
-    document.addEventListener(`keydown`, this._escKeyDownHandler);
-    document.addEventListener(`keydown`, this._enterKeyDownHandler);
-    this._changeMode();
-    this._mode = Mode.DETAILS;
-  }
-
-  setCommentsState(isOnline) {
-    this._commentsComponent.setCommentsState(isOnline);
-  }
-
-  _renderComments() {
-
-    if (this._commentsComponent !== null) {
-      this._commentsComponent = null;
-    }
-
-    this._commentsComponent = new CommentsView(this._commentsModel.getComments());
-    this._commentsComponent.setDeleteClickHandler(this._handleDeleteClick);
-    this._commentsComponent.setEmojiClickHandler(this._handleEmojiChange);
-
-    render(this._movieDetailsComponent.getElement().querySelector(`.film-details__inner`), this._commentsComponent);
-  }
-
-  _clearComments() {
-
-    remove(this._commentsComponent);
-
-  }
-
-  _hideMovieDetails() {
-    hideDetails(this._movieDetailsContainer, this._movieDetailsComponent);
-    document.removeEventListener(`keydown`, this._escKeyDownHandler);
-    document.removeEventListener(`keydown`, this._enterKeyDownHandler);
-    this._mode = Mode.DEFAULT;
-
-    if (this._needMovieList) {
-      this._changeData(
-          UserAction.UPDATE,
-          UpdateType.MINOR,
-          null,
-          this._movie,
-          this._movieContainer
-      );
-      this._needMovieList = false;
-    }
-    this._initPopup();
   }
 
   _handleFavoriteClick() {
@@ -255,7 +261,7 @@ export default class Movie {
         ),
         this._movieContainer
     );
-    this._needMovieList = this._changeFilter === FilterType.FAVORITES && this._mode === Mode.DETAILS;
+    this._needMovieListUpdate = this._changeFilter === FilterType.FAVORITES && this._mode === Mode.DETAILS;
   }
 
   _handleWatchedClick() {
@@ -273,7 +279,7 @@ export default class Movie {
         ),
         this._movieContainer
     );
-    this._needMovieList = this._changeFilter === FilterType.HISTORY && this._mode === Mode.DETAILS;
+    this._needMovieListUpdate = this._changeFilter === FilterType.HISTORY && this._mode === Mode.DETAILS;
   }
 
   _handleAddWatchListClick() {
@@ -290,7 +296,7 @@ export default class Movie {
         ),
         this._movieContainer
     );
-    this._needMovieList = this._changeFilter === FilterType.WATCHLIST && this._mode === Mode.DETAILS;
+    this._needMovieListUpdate = this._changeFilter === FilterType.WATCHLIST && this._mode === Mode.DETAILS;
   }
 
   _handleMovieClick() {
@@ -306,7 +312,7 @@ export default class Movie {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
+    if (evt.key === KeyType.ESCAPE || evt.key === KeyType.ESC) {
       evt.preventDefault();
       this._hideMovieDetails();
     }
@@ -314,7 +320,7 @@ export default class Movie {
 
   _enterKeyDownHandler(evt) {
 
-    if ((evt.ctrlKey) && ((evt.keyCode === 0xA) || (evt.keyCode === 0xD))) {
+    if ((evt.ctrlKey) && (evt.key === KeyType.ENTER)) {
       if (Provider.isOnline()) {
         this._movieDetailsComponent.setState(true);
         evt.preventDefault();

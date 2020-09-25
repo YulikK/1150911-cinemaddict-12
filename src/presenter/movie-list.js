@@ -11,8 +11,8 @@ import ShowMoreButtonView from "../view/show-more-button.js";
 import LoadingView from "../view/loading.js";
 import {render, remove} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
-import {sortByDate, sortByRating, getTopRatedMovies, getMostRecommendedMovies} from "../utils/movie.js";
-import {SortType, UpdateType, UserAction} from "../const.js";
+import {sortByDate, sortByRating, getExtraMovies} from "../utils/movie.js";
+import {SortType, UpdateType, UserAction, SelectionType} from "../const.js";
 
 export default class MovieList {
   constructor(profileElement, movieContainer, movieDetailsContainer, moviesModel, filterModel, api) {
@@ -45,6 +45,7 @@ export default class MovieList {
     this._isLoading = true;
 
     this._handleViewAction = this._handleViewAction.bind(this);
+    this._initRecommendedSection = this._initRecommendedSection.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
@@ -60,11 +61,6 @@ export default class MovieList {
     this._updateProfile();
     this._renderBoard();
 
-  }
-
-  _updateProfile() {
-    this._profileElement.init(filter[FilterType.HISTORY](this._moviesModel.getMovies()).length);
-    this._profileElement.updateElement();
   }
 
   destroy() {
@@ -98,6 +94,11 @@ export default class MovieList {
     });
   }
 
+  _updateProfile() {
+    this._profileElement.init(filter[FilterType.HISTORY](this._moviesModel.getMovies()).length);
+    this._profileElement.updateElement();
+  }
+
   _getMovies() {
     const filterType = this._filterModel.getFilter();
     const movies = this._moviesModel.getMovies();
@@ -110,137 +111,6 @@ export default class MovieList {
         return filtredMovies.sort(sortByRating);
     }
     return filtredMovies;
-  }
-
-  _handleViewAction(
-      actionType,
-      updateTypeCard,
-      updateTypePopup,
-      update,
-      container,
-      needUpdateRecommendedSection = false) {
-    switch (actionType) {
-
-      case UserAction.UPDATE:
-        this._api.updateMovie(update)
-        .then((movie) =>
-          this._api.getComments(movie)
-          .then((movieUpdate) => {
-            this._moviesModel.updateMovie(updateTypeCard, updateTypePopup, movieUpdate);
-            this._updateProfile();
-            if (needUpdateRecommendedSection) {
-              this._initRecommendedSection();
-            }
-          }))
-          .catch(() => {
-            switch (container) {
-              case this._topRatedContainer:
-                if (this._movieTopPresenter[update.id] instanceof Object) {
-                  this._movieTopPresenter[update.id].setAborting();
-                }
-                break;
-              case this._recommendedContainer:
-                if (this._movieRecommendedPresenter[update.id] instanceof Object) {
-                  this._movieRecommendedPresenter[update.id].setAborting();
-                }
-                break;
-              case this._movieListContainerComponent:
-                if (this._moviePresenter[update.id] instanceof Object) {
-                  this._moviePresenter[update.id].setAborting();
-                }
-                break;
-            }
-          });
-        break;
-      case UserAction.UPDATE_LOCAL:
-        this._moviesModel.updateMovie(updateTypeCard, updateTypePopup, update);
-        break;
-    }
-  }
-
-  _handleModelEvent(updateTypeCard, updateTypePopup, data) {
-    switch (updateTypeCard) {
-      case UpdateType.PATCH:
-        this._updateCardPresenters(data);
-        break;
-      case UpdateType.MINOR:
-        this._clearBoard({resetRenderedMovieCount: true});
-        this._renderBoard();
-        break;
-      case UpdateType.MAJOR:
-        this._clearBoard({resetRenderedMovieCount: true, resetSortType: true});
-        this._renderBoard();
-        break;
-      case UpdateType.INIT:
-        this._isLoading = false;
-        remove(this._loadingComponent);
-        this._clearBoard({resetRenderedMovieCount: true, resetSortType: true});
-        this._renderBoard();
-        break;
-    }
-
-    switch (updateTypePopup) {
-      case UpdateType.PATCH:
-        this._updatePopupPresenters(data);
-        break;
-      case UpdateType.MINOR:
-        this._updateCommentsPresenters(data);
-        break;
-    }
-  }
-
-  _updateCardPresenters(data) {
-    if (this._moviePresenter[data.id] instanceof Object) {
-      this._moviePresenter[data.id].updateCard(data);
-    }
-    if (this._movieTopPresenter[data.id] instanceof Object) {
-      this._movieTopPresenter[data.id].updateCard(data);
-    }
-    if (this._movieRecommendedPresenter[data.id] instanceof Object) {
-      this._movieRecommendedPresenter[data.id].updateCard(data);
-    }
-  }
-
-  _updatePopupPresenters(data) {
-    if (this._moviePresenter[data.id] instanceof Object) {
-      this._moviePresenter[data.id].updatePopup(data);
-    }
-    if (this._movieTopPresenter[data.id] instanceof Object) {
-      this._movieTopPresenter[data.id].updatePopup(data);
-    }
-    if (this._movieRecommendedPresenter[data.id] instanceof Object) {
-      this._movieRecommendedPresenter[data.id].updatePopup(data);
-    }
-  }
-
-  _updateCommentsPresenters(data) {
-    if (this._moviePresenter[data.id] instanceof Object) {
-      this._moviePresenter[data.id].updateComments();
-    }
-    if (this._movieTopPresenter[data.id] instanceof Object) {
-      this._movieTopPresenter[data.id].updateComments();
-    }
-    if (this._movieRecommendedPresenter[data.id] instanceof Object) {
-      this._movieRecommendedPresenter[data.id].updateComments();
-    }
-  }
-
-
-  _handleModeChange() {
-    Object
-      .values(this._moviePresenter)
-      .forEach((presenter) => presenter.resetView());
-  }
-
-  _handleSortTypeChange(sortType) {
-    if (this._currentSortType === sortType) {
-      return;
-    }
-
-    this._currentSortType = sortType;
-
-    this._clearBoard({resetRenderedMovieCount: true});
-    this._renderBoard();
   }
 
   _renderSort() {
@@ -262,6 +132,7 @@ export default class MovieList {
         container,
         this._movieDetailsContainer,
         this._handleViewAction,
+        this._initRecommendedSection,
         this._handleModeChange,
         this._filterModel.getFilter(),
         this._api
@@ -282,21 +153,6 @@ export default class MovieList {
 
   _renderLoading() {
     render(this._movieContainer, this._loadingComponent);
-  }
-
-  _handleShowMoreButtonClick() {
-
-    const movieCount = this._getMovies().length;
-    const newRenderedMovieCount = Math.min(movieCount, this._renderedMovieCount + CARD_COUNT_PER_STEP);
-    const movies = this._getMovies().slice(this._renderedMovieCount, newRenderedMovieCount);
-
-    this._renderMovies(movies, this._movieListContainerComponent, this._moviePresenter);
-    this._renderedMovieCount = newRenderedMovieCount;
-
-    if (this._renderedMovieCount >= movieCount) {
-      remove(this._showMoreButtonComponent);
-    }
-
   }
 
   _renderShowMoreButton() {
@@ -378,11 +234,12 @@ export default class MovieList {
       this._topRatedComponent = null;
     }
 
-    const topRatedMovies = getTopRatedMovies(this._moviesModel.getMovies());
+    const topRatedMovies = getExtraMovies(this._moviesModel.getMovies(), SelectionType.RATING);
 
     if (topRatedMovies.length !== 0) {
 
       this._renderTopList(topRatedMovies);
+
     }
 
   }
@@ -395,11 +252,12 @@ export default class MovieList {
       this._recommendedComponent = null;
     }
 
-    const mostRecommendedMovies = getMostRecommendedMovies(this._moviesModel.getMovies());
+    const mostRecommendedMovies = getExtraMovies(this._moviesModel.getMovies(), SelectionType.COMMENTS);
 
     if (mostRecommendedMovies.length !== 0) {
 
       this._renderRecommendedList(mostRecommendedMovies);
+
     }
 
   }
@@ -421,6 +279,146 @@ export default class MovieList {
     this._recommendedContainer = this._recommendedComponent.getContainer();
 
     this._renderMovies(mostRecommendedMovies, this._recommendedContainer, this._movieRecommendedPresenter);
+
+  }
+
+  _updateCardPresenters(data) {
+    if (this._moviePresenter[data.id] instanceof Object) {
+      this._moviePresenter[data.id].updateCard(data);
+    }
+    if (this._movieTopPresenter[data.id] instanceof Object) {
+      this._movieTopPresenter[data.id].updateCard(data);
+    }
+    if (this._movieRecommendedPresenter[data.id] instanceof Object) {
+      this._movieRecommendedPresenter[data.id].updateCard(data);
+    }
+  }
+
+  _updatePopupPresenters(data) {
+    if (this._moviePresenter[data.id] instanceof Object) {
+      this._moviePresenter[data.id].updatePopup(data);
+    }
+    if (this._movieTopPresenter[data.id] instanceof Object) {
+      this._movieTopPresenter[data.id].updatePopup(data);
+    }
+    if (this._movieRecommendedPresenter[data.id] instanceof Object) {
+      this._movieRecommendedPresenter[data.id].updatePopup(data);
+    }
+  }
+
+  _updateCommentsPresenters(data) {
+    if (this._moviePresenter[data.id] instanceof Object) {
+      this._moviePresenter[data.id].updateComments();
+    }
+    if (this._movieTopPresenter[data.id] instanceof Object) {
+      this._movieTopPresenter[data.id].updateComments();
+    }
+    if (this._movieRecommendedPresenter[data.id] instanceof Object) {
+      this._movieRecommendedPresenter[data.id].updateComments();
+    }
+  }
+
+  _handleViewAction(
+      actionType,
+      updateTypeCard,
+      updateTypePopup,
+      update,
+      container) {
+    switch (actionType) {
+
+      case UserAction.UPDATE:
+        this._api.updateMovie(update)
+        .then((movie) =>
+          this._api.getComments(movie)
+          .then((movieUpdate) => {
+            this._moviesModel.updateMovie(updateTypeCard, updateTypePopup, movieUpdate);
+            this._updateProfile();
+          }))
+          .catch(() => {
+            switch (container) {
+              case this._topRatedContainer:
+                if (this._movieTopPresenter[update.id] instanceof Object) {
+                  this._movieTopPresenter[update.id].setAborting();
+                }
+                break;
+              case this._recommendedContainer:
+                if (this._movieRecommendedPresenter[update.id] instanceof Object) {
+                  this._movieRecommendedPresenter[update.id].setAborting();
+                }
+                break;
+              case this._movieListContainerComponent:
+                if (this._moviePresenter[update.id] instanceof Object) {
+                  this._moviePresenter[update.id].setAborting();
+                }
+                break;
+            }
+          });
+        break;
+      case UserAction.UPDATE_LOCAL:
+        this._moviesModel.updateMovie(updateTypeCard, updateTypePopup, update);
+        break;
+    }
+  }
+
+  _handleModelEvent(updateTypeCard, updateTypePopup, data) {
+    switch (updateTypeCard) {
+      case UpdateType.PATCH:
+        this._updateCardPresenters(data);
+        break;
+      case UpdateType.MINOR:
+        this._clearBoard({resetRenderedMovieCount: true});
+        this._renderBoard();
+        break;
+      case UpdateType.MAJOR:
+        this._clearBoard({resetRenderedMovieCount: true, resetSortType: true});
+        this._renderBoard();
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this._clearBoard({resetRenderedMovieCount: true, resetSortType: true});
+        this._renderBoard();
+        break;
+    }
+    switch (updateTypePopup) {
+      case UpdateType.PATCH:
+        this._updatePopupPresenters(data);
+        break;
+      case UpdateType.MINOR:
+        this._updateCommentsPresenters(data);
+        break;
+    }
+  }
+
+  _handleModeChange() {
+    Object
+      .values(this._moviePresenter)
+      .forEach((presenter) => presenter.resetView());
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._currentSortType = sortType;
+
+    this._clearBoard({resetRenderedMovieCount: true});
+    this._renderBoard();
+  }
+
+  _handleShowMoreButtonClick() {
+
+    const movieCount = this._getMovies().length;
+    const newRenderedMovieCount = Math.min(movieCount, this._renderedMovieCount + CARD_COUNT_PER_STEP);
+    const movies = this._getMovies().slice(this._renderedMovieCount, newRenderedMovieCount);
+
+    this._renderMovies(movies, this._movieListContainerComponent, this._moviePresenter);
+    this._renderedMovieCount = newRenderedMovieCount;
+
+    if (this._renderedMovieCount >= movieCount) {
+      remove(this._showMoreButtonComponent);
+    }
 
   }
 

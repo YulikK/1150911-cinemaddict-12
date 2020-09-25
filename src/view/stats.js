@@ -18,11 +18,6 @@ export default class Statis extends AbstractView {
     return createStatisTemplate();
   }
 
-  _menuClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.menuClick(MenuItem.STATISTICS);
-  }
-
   setActiveMenuElement() {
 
     this.getElement().classList.add(`main-navigation__additional--active`);
@@ -39,4 +34,10 @@ export default class Statis extends AbstractView {
     this._callback.menuClick = callback;
     this.getElement().addEventListener(`click`, this._menuClickHandler);
   }
+
+  _menuClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.menuClick(MenuItem.STATISTICS);
+  }
+
 }

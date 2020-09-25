@@ -1,7 +1,8 @@
 import SmartView from "./smart.js";
-import {ucFirst, makeItemsUnique} from "../utils/common.js";
+import {setFirstCapital} from "../utils/common.js";
+import {getUniqueItems} from "../utils/movie.js";
 import {getWatchedMovieInTime, getCountWatchedMovieByGenre, countDuration, getHours, getMinuts} from "../utils/statistics.js";
-import {StatisticsType, BAR_HEIGHT} from "../const.js";
+import {StatisticsType, SelectionType, BAR_HEIGHT} from "../const.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
@@ -69,7 +70,7 @@ const renderGenresChart = (genresCtx, uniqueGenres, countMovies) => {
 const createStatisticsFilterTemplate = (statisticFilter, checked) => {
   return (`
   <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-${StatisticsType[statisticFilter]}" value="${StatisticsType[statisticFilter]}" ${checked ? `checked=""` : ``}>
-  <label for="statistic-${StatisticsType[statisticFilter]}" class="statistic__filters-label">${ucFirst(StatisticsType[statisticFilter])}</label>`);
+  <label for="statistic-${StatisticsType[statisticFilter]}" class="statistic__filters-label">${setFirstCapital(StatisticsType[statisticFilter])}</label>`);
 };
 
 const createStatisticsTemplate = (data) => {
@@ -81,8 +82,7 @@ const createStatisticsTemplate = (data) => {
   const countDurationWatched = countDuration(moviesWatched);
   const durationH = getHours(countDurationWatched);
   const durationM = getMinuts(countDurationWatched);
-  const movieGenres = [].concat(...moviesWatched.map((movie) => movie.genres));
-  const uniqueGenres = makeItemsUnique(movieGenres);
+  const uniqueGenres = getUniqueItems(moviesWatched, SelectionType.GENRES);
   const countMovies = uniqueGenres.map((genre) => getCountWatchedMovieByGenre(moviesWatched, genre));
   const topGenre = moviesWatched.length === 0 ? `` : uniqueGenres[countMovies.indexOf(Math.max(...countMovies))];
 
@@ -141,6 +141,10 @@ export default class Statistic extends SmartView {
     this._setFilterChangeHandler(this._filterChangeHandler);
   }
 
+  getTemplate() {
+    return createStatisticsTemplate(this._data);
+  }
+
   removeElement() {
 
     super.removeElement();
@@ -157,37 +161,6 @@ export default class Statistic extends SmartView {
     this._setFilterChangeHandler(this._filterChangeHandler);
   }
 
-  _filterChangeHandler(evt) {
-
-    const prevFilterType = this._data.filterType;
-
-    if (prevFilterType === evt.target.value) {
-      return;
-    }
-
-    this.updateData({
-      filterType: evt.target.value
-    });
-
-  }
-
-  _setActiveFilterElement(newFilterType, oldFilterType) {
-
-    const filterComponent = this.getElement();
-
-    const oldFilterElement = filterComponent.querySelector(`input[id=statistic-${oldFilterType}]`);
-    const newFilterElement = filterComponent.querySelector(`input[id=statistic-${newFilterType}]`);
-
-    oldFilterElement.removeAttribute(`checked`);
-    newFilterElement.setAttribute(`checked`, true);
-
-  }
-
-
-  getTemplate() {
-    return createStatisticsTemplate(this._data);
-  }
-
   _setCharts() {
     if (this._genresCart !== null) {
       this._genresCart = null;
@@ -197,8 +170,8 @@ export default class Statistic extends SmartView {
     const genresCtx = this.getElement().querySelector(`.statistic__chart`);
 
     const moviesWatched = movies.filter((movie) => getWatchedMovieInTime(movie, filterType));
-    const movieGenres = [].concat(...moviesWatched.map((movie) => movie.genres));
-    const uniqueGenres = makeItemsUnique(movieGenres);
+    const uniqueGenres = getUniqueItems(moviesWatched, SelectionType.GENRES);
+
     const countMovies = uniqueGenres.map((genre) => getCountWatchedMovieByGenre(moviesWatched, genre));
 
     if (uniqueGenres.length !== 0) {
@@ -215,4 +188,21 @@ export default class Statistic extends SmartView {
     filterItems
     .forEach((filterItem) => filterItem.addEventListener(`click`, this._filterChangeHandler));
   }
+
+  _filterChangeHandler(evt) {
+
+    const prevFilterType = this._data.filterType;
+
+    if (prevFilterType === evt.target.value) {
+      return;
+    }
+
+    this.updateData({
+      filterType: evt.target.value
+    });
+
+    this.restoreHandlers();
+
+  }
+
 }

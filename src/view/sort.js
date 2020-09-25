@@ -25,15 +25,10 @@ export default class Sort extends AbstractView {
     return createSortTemplate(this._currentSortType);
   }
 
-  _setActiveSortElement(newSortType, oldSortType) {
+  setSortTypeChangeHandler(callback) {
 
-    const sortComponent = this.getElement();
-
-    const oldSortElement = sortComponent.querySelector(`a[data-sort-type="${oldSortType}"]`);
-    const newSortElement = sortComponent.querySelector(`a[data-sort-type="${newSortType}"]`);
-
-    oldSortElement.classList.remove(`sort__button--active`);
-    newSortElement.classList.add(`sort__button--active`);
+    this._callback.sortTypeChange = callback;
+    this.getElement().addEventListener(`click`, this._sortTypeChangeHandler);
 
   }
 
@@ -46,13 +41,5 @@ export default class Sort extends AbstractView {
     this._callback.sortTypeChange(evt.target.dataset.sortType);
 
   }
-
-  setSortTypeChangeHandler(callback) {
-
-    this._callback.sortTypeChange = callback;
-    this.getElement().addEventListener(`click`, this._sortTypeChangeHandler);
-
-  }
-
 
 }

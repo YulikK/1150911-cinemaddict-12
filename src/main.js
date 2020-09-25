@@ -7,7 +7,7 @@ import {render, remove} from "./utils/render.js";
 import {MenuItem, UpdateType} from "./const.js";
 import MovieListPresenter from "./presenter/movie-list.js";
 import FilterPresenter from "./presenter/filter.js";
-import Api from "./api/index.js";
+import IndexApi from "./api/index.js";
 import Store from "./api/store.js";
 import Provider from "./api/provider.js";
 
@@ -19,7 +19,7 @@ const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 let menuItem = null;
 
-const api = new Api(END_POINT, AUTHORIZATION);
+const api = new IndexApi(END_POINT, AUTHORIZATION);
 const store = new Store(STORE_NAME, window.localStorage);
 const apiWithProvider = new Provider(api, store);
 
@@ -30,15 +30,12 @@ const siteBodyElement = document.querySelector(`body`);
 const siteHeaderElement = siteBodyElement.querySelector(`.header`);
 const siteMainElement = siteBodyElement.querySelector(`.main`);
 const siteFooterElement = siteBodyElement.querySelector(`.footer`);
-
-const profileElement = new ProfileView();
-render(siteHeaderElement, profileElement);
-const filterPresenter = new FilterPresenter(siteMainElement, filterModel, moviesModel);
-
-const movieListPresenter = new MovieListPresenter(profileElement, siteMainElement, siteBodyElement, moviesModel, filterModel, apiWithProvider);
-
 const siteStatisticsElement = siteFooterElement.querySelector(`.footer__statistics`);
 
+const profileElement = new ProfileView();
+
+const filterPresenter = new FilterPresenter(siteMainElement, filterModel, moviesModel);
+const movieListPresenter = new MovieListPresenter(profileElement, siteMainElement, siteBodyElement, moviesModel, filterModel, apiWithProvider);
 
 let statisticsComponent = null;
 
@@ -64,6 +61,7 @@ const handleSiteMenuClick = (newMenuItem) => {
   }
 };
 
+render(siteHeaderElement, profileElement);
 movieListPresenter.init();
 
 apiWithProvider.getMovies()
@@ -95,14 +93,7 @@ apiWithProvider.getMovies()
   });
 });
 
-window.addEventListener(`load`, () => {
-  navigator.serviceWorker.register(`/sw.js`)
-    .then(() => {
-      console.log(`ServiceWorker available`); // eslint-disable-line
-    }).catch(() => {
-      console.error(`ServiceWorker isn't available`); // eslint-disable-line
-    });
-});
+window.addEventListener(`load`, () => navigator.serviceWorker.register(`/sw.js`));
 
 window.addEventListener(`online`, () => {
   document.title = document.title.replace(`[offline] `, ``);

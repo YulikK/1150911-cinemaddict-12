@@ -1,16 +1,16 @@
-import {RATING} from "../const.js";
+import {ProfileType} from "../const.js";
 import Smart from "./smart.js";
 
 const getRating = (watched) => {
 
   let ratingProfile = ``;
 
-  const keys = Object.keys(RATING);
+  const keys = Object.keys(ProfileType);
 
   keys.forEach((key) => {
 
     if (key <= watched) {
-      ratingProfile = RATING[key];
+      ratingProfile = ProfileType[key];
     }
 
   });
@@ -31,16 +31,12 @@ const createProfileTemplate = (watched) => {
 
 export default class Profile extends Smart {
 
-  init(watched) {
-    this._watched = watched;
-  }
-
   getTemplate() {
     return createProfileTemplate(this._watched);
   }
 
-  restoreHandlers() {
-
+  init(watched) {
+    this._watched = watched;
   }
 
 }

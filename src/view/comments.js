@@ -113,6 +113,15 @@ export default class Comments extends SmartView {
     return this._currentEmoji;
   }
 
+  changeEmoji(newEmoji) {
+    if (this._currentEmoji !== newEmoji) {
+      const preEmoji = this._currentEmoji;
+      this._currentEmoji = newEmoji;
+      this._setNewEmoji(newEmoji);
+      this._setActiveEmojiItem(newEmoji, preEmoji);
+    }
+  }
+
   setDeletingState(comment, isDisabled) {
     const selectorUpdateElement = `button[value="${comment.id}"]`;
     const elementTemplate = deleteCommentTemplate(comment.id, isDisabled);
@@ -132,23 +141,18 @@ export default class Comments extends SmartView {
     });
   }
 
-  _deleteClickHandler(evt) {
-    evt.preventDefault();
-    const commentId = this._getElementById(evt.target.value);
-    this.setDeletingState(commentId, true);
-    this._callback.deleteClick(commentId);
-  }
-
-  _emojiClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.emojiClick(evt.target.value);
-  }
-
   setDeleteClickHandler(callback) {
     this._callback.deleteClick = callback;
     const commentsItems = this.getElement().querySelectorAll(`.film-details__comment-delete`);
     commentsItems
       .forEach((commentItem) => commentItem.addEventListener(`click`, this._deleteClickHandler));
+  }
+
+  setEmojiClickHandler(callback) {
+    this._callback.emojiClick = callback;
+    const emojiItems = this.getElement().querySelectorAll(`input[name=comment-emoji]`);
+    emojiItems
+      .forEach((emojiItem) => emojiItem.addEventListener(`click`, this._emojiClickHandler));
   }
 
   _setNewEmoji(newEmoji) {
@@ -174,15 +178,6 @@ export default class Comments extends SmartView {
     }
   }
 
-  changeEmoji(newEmoji) {
-    if (this._currentEmoji !== newEmoji) {
-      const preEmoji = this._currentEmoji;
-      this._currentEmoji = newEmoji;
-      this._setNewEmoji(newEmoji);
-      this._setActiveEmojiItem(newEmoji, preEmoji);
-    }
-  }
-
   _getElementById(id) {
     const index = this._comments.findIndex((comment) => comment.id === id);
     const commentElement = this._comments[index];
@@ -190,17 +185,15 @@ export default class Comments extends SmartView {
 
   }
 
-  setEmojiClickHandler(callback) {
-    this._callback.emojiClick = callback;
-    const emojiItems = this.getElement().querySelectorAll(`input[name=comment-emoji]`);
-    emojiItems
-      .forEach((emojiItem) => emojiItem.addEventListener(`click`, this._emojiClickHandler));
+  _deleteClickHandler(evt) {
+    evt.preventDefault();
+    const commentId = this._getElementById(evt.target.value);
+    this.setDeletingState(commentId, true);
+    this._callback.deleteClick(commentId);
   }
 
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-    const commentsItems = this.getElement().querySelectorAll(`.film-details__comment-delete`);
-    commentsItems
-      .forEach((commentItem) => commentItem.addEventListener(`click`, this._deleteClickHandler));
+  _emojiClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.emojiClick(evt.target.value);
   }
 }

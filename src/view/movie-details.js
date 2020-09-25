@@ -131,15 +131,6 @@ export default class MovieDetails extends SmartView {
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
-  setState(isDisabled = false) {
-    const formElement = this.getElement().querySelector(`.film-details__inner`);
-    if (isDisabled) {
-      formElement.setAttribute(`disabled`, `disabled`);
-    } else {
-      formElement.removeAttribute(`disabled`);
-    }
-  }
-
   getTemplate() {
     return createMovieDetailsTemplate(this._movie);
   }
@@ -156,24 +147,17 @@ export default class MovieDetails extends SmartView {
     return createWatchListTemplate(this._movie.isWatchList);
   }
 
-  _closeClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.closeClick(this._movie);
+  getFormElement() {
+    return this.getElement().querySelector(`.film-details__inner`);
   }
 
-  _favoriteClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.favoriteClick();
-  }
-
-  _watchedClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.watchedClick();
-  }
-
-  _addWatchListClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.addWatchListClick();
+  setState(isDisabled = false) {
+    const formElement = this.getFormElement();
+    if (isDisabled) {
+      formElement.setAttribute(`disabled`, `disabled`);
+    } else {
+      formElement.removeAttribute(`disabled`);
+    }
   }
 
   setCloseClickHandler(callback) {
@@ -194,6 +178,26 @@ export default class MovieDetails extends SmartView {
   setAddWatchListClickHandler(callback) {
     this._callback.addWatchListClick = callback;
     this.getElement().querySelector(`input[id=watchlist]`).addEventListener(`click`, this._addWatchListClickHandler);
+  }
+
+  _closeClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.closeClick(this._movie);
+  }
+
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
+  _watchedClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchedClick();
+  }
+
+  _addWatchListClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.addWatchListClick();
   }
 
 }

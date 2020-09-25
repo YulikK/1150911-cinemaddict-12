@@ -1,4 +1,4 @@
-import {ucFirst} from "../utils/common.js";
+import {setFirstCapital} from "../utils/common.js";
 import {MenuItem} from "../const.js";
 import AbstractView from "./abstract.js";
 
@@ -8,7 +8,7 @@ const createFilterItemTemplate = (filter, currentFilterType) => {
   return (
     `<a href="#${name}"
       class="main-navigation__item ${type === currentFilterType ? ` main-navigation__item--active` : ``}" data-filter-type="${type}">
-      ${name === `All` ? ucFirst(name) + ` movies` : ucFirst(name)}
+      ${name === `All` ? setFirstCapital(name) + ` movies` : setFirstCapital(name)}
       ${name === `All` ? `` : ` <span class="main-navigation__item-count">${count}</span>`}
     </a>`
   );
@@ -41,6 +41,15 @@ export default class Navigation extends AbstractView {
     return createNavigationTemplate(this._filterItems, this._currentFilter);
   }
 
+  setFilterTypeChangeHandler(callback) {
+    this._callback.filterTypeChange = callback;
+    this.getElement().querySelector(`.main-navigation__items`).addEventListener(`click`, this._filterTypeClickHandler);
+  }
+
+  setFilterClikHandler(callback) {
+    this._callback.menuItemClick = callback;
+  }
+
   _filterTypeClickHandler(evt) {
     if (evt.target.tagName !== `A`) {
       return;
@@ -54,14 +63,4 @@ export default class Navigation extends AbstractView {
 
 
   }
-
-  setFilterTypeChangeHandler(callback) {
-    this._callback.filterTypeChange = callback;
-    this.getElement().querySelector(`.main-navigation__items`).addEventListener(`click`, this._filterTypeClickHandler);
-  }
-
-  setFilterClikHandler(callback) {
-    this._callback.menuItemClick = callback;
-  }
-
 }

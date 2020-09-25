@@ -34,6 +34,24 @@ export default class Provider {
     return Promise.resolve(storeMovies.map(MoviesModel.adaptToClient));
   }
 
+  getComments(movie) {
+    if (Provider.isOnline()) {
+      return this._api.getComments(movie)
+        .then((comments) => {
+          movie.comments = comments;
+          return movie;
+        })
+        .then((updatedMovie) => {
+          this._store.setItem(movie.id, MoviesModel.adaptToServer(updatedMovie));
+          return updatedMovie;
+        });
+    }
+
+    this._store.setItem(movie.id, MoviesModel.adaptToServer(Object.assign({}, movie)));
+
+    return Promise.resolve(movie);
+  }
+
   updateMovie(movie) {
     if (Provider.isOnline()) {
       return this._api.updateMovie(movie)
@@ -61,25 +79,6 @@ export default class Provider {
       return this._api.deleteComment(comment);
     }
     return null;
-  }
-
-
-  getComments(movie) {
-    if (Provider.isOnline()) {
-      return this._api.getComments(movie)
-        .then((comments) => {
-          movie.comments = comments;
-          return movie;
-        })
-        .then((updatedMovie) => {
-          this._store.setItem(movie.id, MoviesModel.adaptToServer(updatedMovie));
-          return updatedMovie;
-        });
-    }
-
-    this._store.setItem(movie.id, MoviesModel.adaptToServer(Object.assign({}, movie)));
-
-    return Promise.resolve(movie);
   }
 
   sync() {

@@ -13,7 +13,7 @@ const SuccessHTTPStatusRange = {
   MAX: 299
 };
 
-export default class Api {
+export default class Index {
   constructor(endPoint, authorization) {
     this._endPoint = endPoint;
     this._authorization = authorization;
@@ -21,7 +21,7 @@ export default class Api {
 
   getMovies() {
     const moviesData = this._load({url: `movies`})
-    .then(Api.toJSON)
+    .then(Index.toJSON)
     .then((movies) => movies.map(MoviesModel.adaptToClient));
 
     return moviesData;
@@ -29,7 +29,7 @@ export default class Api {
 
   getComments(movie) {
     return this._load({url: `comments/${movie.id}`})
-      .then(Api.toJSON)
+      .then(Index.toJSON)
       .then((comments) => comments.map(CommentsModel.adaptToClient));
   }
 
@@ -40,7 +40,7 @@ export default class Api {
       body: JSON.stringify(MoviesModel.adaptToServer(movie)),
       headers: new Headers({"Content-Type": `application/json`})
     })
-      .then(Api.toJSON)
+      .then(Index.toJSON)
       .then(MoviesModel.adaptToClient);
   }
 
@@ -51,7 +51,7 @@ export default class Api {
       body: JSON.stringify(CommentsModel.adaptToServer(comment)),
       headers: new Headers({"Content-Type": `application/json`})
     })
-      .then(Api.toJSON)
+      .then(Index.toJSON)
       .then((response) => response.comments.map(CommentsModel.adaptToClient));
   }
 
@@ -69,7 +69,7 @@ export default class Api {
       body: JSON.stringify(data),
       headers: new Headers({"Content-Type": `application/json`})
     })
-      .then(Api.toJSON);
+      .then(Index.toJSON);
   }
 
   _load({
@@ -84,8 +84,8 @@ export default class Api {
         `${this._endPoint}/${url}`,
         {method, body, headers}
     )
-      .then(Api.checkStatus)
-      .catch(Api.catchError);
+      .then(Index.checkStatus)
+      .catch(Index.catchError);
   }
 
   static checkStatus(response) {
